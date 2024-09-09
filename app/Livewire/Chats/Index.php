@@ -33,11 +33,12 @@ class Index extends Component
     #[On('echo:groupChatMessage,GroupChatMessageSent')]
     #[On('echo:gcIsSeen,GroupChatIsSeen')]
     #[On('echo:gcCreated,GroupChatCreated')]
+    #[On('echo:AddMemberToGcSuccess,AddMemberToGroupChat')]
     public function chats()
     {
         $user = auth()->user();
 
-        $users = User::withCount('unseenSenderChats')->get()->sortByDesc(function ($user) {
+        $users = User::with(['senderChats', 'receiverChats'])->withCount('unseenSenderChats')->get()->sortByDesc(function ($user) {
             $allChats = $user->receiverChats->concat($user->senderChats)
                 ->filter(function ($chat) {
                     return $chat->receiver_id === auth()->user()->id || $chat->sender_id === auth()->user()->id;
@@ -163,7 +164,13 @@ class Index extends Component
             'group_chat_token'              =>              $token
         ]);
 
-        $group_chat->groupChatMembers()->attach($this->member);
+        foreach ($this->member as $memberId) {
+            $isAdmin = ($memberId == $userId);
+
+            $toAttact[$memberId] = ['is_admin' => $isAdmin];
+        }
+
+        $group_chat->groupChatMembers()->attach($toAttact);
 
         $this->dispatch('toastr', [
             'type'          =>          'success',
@@ -172,7 +179,7 @@ class Index extends Component
 
         event(new GroupChatCreated($group_chat));
 
-        $this->reset(['group_chat_name', 'member']);
+        $this->reset(['group_chat_name', 'member', 'search_member']);
 
         $this->dispatch('closeModal');
     }

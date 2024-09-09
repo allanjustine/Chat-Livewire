@@ -38,4 +38,9 @@ class GroupChatContent extends Model
         return $this->belongsToMany(User::class, 'group_chat_deleted_bies')
             ->withTimestamps();
     }
+
+    public function GroupChatReactions()
+    {
+        return $this->hasMany(GroupChatReaction::class);
+    }
 }

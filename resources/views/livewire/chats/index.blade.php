@@ -1,6 +1,6 @@
 <div>
     <div class="d-md-flex bg-secondary text-white" style="height: 91.5vh;">
-        <div wire:ignore.self class="offcanvas offcanvas-start bg-dark text-white overflow-y-auto"
+        <div wire:ignore.self class="offcanvas offcanvas-start bg-dark text-white overflow-y-auto mt-1"
             data-bs-backdrop="static" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
             <div class="offcanvas-header py-3 bg-dark sticky-top text-white">
                 <div class="offcanvas-title" id="staticBackdropLabel">
@@ -23,12 +23,12 @@
                         <button
                             class="btn btn-link text-decoration-none btn-sm {{ $people === true ? 'bg-info' : 'bg-dark' }} text-white my-2"
                             type="button" wire:click='peopleClick'>
-                            People
+                            <i class="far fa-user"></i> People
                         </button>
                         <button
                             class="btn btn-link text-decoration-none btn-sm {{ $groupChat === true ? 'bg-info' : 'bg-dark' }} text-white my-2"
                             type="button" wire:click='groupChatClick'>
-                            Group Chat
+                            <i class="far fa-users"></i> Group Chat
                         </button>
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                         src="/images/profile.png"
                         @else
                         src="{{ Storage::url($search->profile_picture) }}"
-                        @endif width="35" height="35"
+                        @endif width="25" height="25"
                         alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $search->name }}</span>
                     </li>
@@ -70,12 +70,12 @@
                         src="/images/profile.png"
                         @else
                         src="{{ Storage::url($user->profile_picture) }}"
-                        @endif width="35" height="35"
+                        @endif width="25" height="25"
                         alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $user->name }}</span>
                         @if ($user->unseen_sender_chats_count > 0)
                         <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{
-                            $user->unseen_sender_chats_count }}</span>
+                            $user->unseen_sender_chats_count > 9 ? '9+' : $user->unseen_sender_chats_count }}</span>
                         @endif
                     </li>
                 </a>
@@ -89,7 +89,7 @@
                 <a href="/gc/{{ $sgc->group_chat_token }}" wire:navigate
                     class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center text-white bg-secondary">
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="GC Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $sgc->group_chat_name }}</span>
                     </li>
@@ -113,12 +113,12 @@
                     class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center text-white bg-secondary">
                         <span class="online-dot"></span>
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="GC Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $gc->group_chat_name }}</span>
                         @if ($gc->unseen_count > 0)
-                        <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{
-                            $gc->unseen_count }}</span>
+                        <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">
+                            {{ $gc->unseen_count > 9 ? '9+' : $gc->unseen_count }}</span>
                         @endif
                     </li>
                 </a>
@@ -132,7 +132,7 @@
 
             </ul>
         </div>
-        <div class="col-3 bg-light overflow-auto d-none d-md-block bg-dark">
+        <div class="col-md-3 bg-light overflow-auto d-none d-md-block bg-dark" style="max-width: 250px;">
             <div class="py-3 px-2 sticky-top bg-dark text-white">
                 <h3>Chats</h3>
                 @if ($people === true)
@@ -150,12 +150,12 @@
                         <button
                             class="btn btn-link text-decoration-none btn-sm {{ $people === true ? 'bg-info' : 'bg-dark' }} text-white my-2"
                             type="button" wire:click='peopleClick'>
-                            People
+                            <i class="far fa-user"></i> People
                         </button>
                         <button
                             class="btn btn-link text-decoration-none btn-sm {{ $groupChat === true ? 'bg-info' : 'bg-dark' }} text-white my-2"
                             type="button" wire:click='groupChatClick'>
-                            Group Chat
+                            <i class="far fa-users"></i> Group Chat
                         </button>
                     </div>
                 </div>
@@ -174,7 +174,7 @@
                         src="/images/profile.png"
                         @else
                         src="{{ Storage::url($search->profile_picture) }}"
-                        @endif width="35" height="35"
+                        @endif width="25" height="25"
                         alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $search->name }}</span>
                     </li>
@@ -196,12 +196,12 @@
                         src="/images/profile.png"
                         @else
                         src="{{ Storage::url($user->profile_picture) }}"
-                        @endif width="35" height="35"
+                        @endif width="25" height="25"
                         alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $user->name }}</span>
                         @if ($user->unseen_sender_chats_count > 0)
                         <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{
-                            $user->unseen_sender_chats_count }}</span>
+                            $user->unseen_sender_chats_count > 9 ? '9+' : $user->unseen_sender_chats_count }}</span>
                         @endif
                     </li>
                 </a>
@@ -215,7 +215,7 @@
                 <a href="/gc/{{ $sgc->group_chat_token }}" wire:navigate
                     class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center text-white bg-secondary">
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="GC Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $sgc->group_chat_name }}</span>
                     </li>
@@ -239,12 +239,11 @@
                     class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center text-white bg-secondary">
                         <span class="online-dot"></span>
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="GC Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $gc->group_chat_name }}</span>
                         @if ($gc->unseen_count > 0)
-                        <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{
-                            $gc->unseen_count }}</span>
+                        <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{ $gc->unseen_count > 9 ? '9+' : $gc->unseen_count }}</span>
                         @endif
                     </li>
                 </a>

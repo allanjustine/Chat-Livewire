@@ -73,6 +73,8 @@ class Register extends Component
             'profile_picture'           =>              $path
         ]);
 
+        $user->assignRole('user');
+
         event(new NewUserRegister($user));
 
         $this->reset();

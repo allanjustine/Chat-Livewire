@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
@@ -18,9 +19,17 @@ class Login extends Component
     #[Validate(['required', 'min:6'])]
     public $password;
 
+    public $remember;
+
     public function login()
     {
         $this->validate();
+
+        if ($this->remember) {
+            Cookie::queue('remembered_username_or_email', $this->username_or_email, 60 * 24 * 30); // 30 days
+        } else {
+            Cookie::queue(Cookie::forget('remembered_username_or_email'));
+        }
 
         $user = User::where('email', $this->username_or_email)
             ->orWhere('username', $this->username_or_email)
@@ -57,6 +66,11 @@ class Login extends Component
 
             return;
         }
+    }
+
+    public function mount()
+    {
+        $this->username_or_email = Cookie::get('remembered_username_or_email');
     }
 
     public function render()

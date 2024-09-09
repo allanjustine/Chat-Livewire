@@ -10,4 +10,14 @@ class Emoji extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function chatReactions()
+    {
+        return $this->hasMany(ChatReaction::class);
+    }
+
+    public function GroupChatReactions()
+    {
+        return $this->hasMany(GroupChatReaction::class);
+    }
 }

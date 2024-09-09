@@ -20,6 +20,10 @@
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
+                    <div class="form-group mb-2 align-items-center d-flex gap-1">
+                        <input type="checkbox" id="remember_me" wire:model="remember" style="cursor: pointer;">
+                        <label for="remember">Remember Me</label>
+                    </div>
                     <button type="submit" class="btn btn-primary form-control btn-sm">
                         <span wire:loading.remove>Login</span>
                         <div wire:loading>

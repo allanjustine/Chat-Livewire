@@ -83,4 +83,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Like::class);
     }
+
+    public function chatReactions()
+    {
+        return $this->hasMany(ChatReaction::class);
+    }
+
+    public function GroupChatReactions()
+    {
+        return $this->hasMany(GroupChatReaction::class);
+    }
 }

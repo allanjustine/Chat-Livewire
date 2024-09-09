@@ -11,16 +11,18 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GroupChatIsSeen implements ShouldBroadcastNow
+class AddMemberToGroupChat implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $gcSeen;
+
     /**
      * Create a new event instance.
      */
-    public function __construct($gcSeen)
+    public $member;
+
+    public function __construct($member)
     {
-        $this->gcSeen = $gcSeen;
+        $this->member = $member;
     }
 
     /**
@@ -31,7 +33,7 @@ class GroupChatIsSeen implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new Channel('gcIsSeen'),
+            new Channel('AddMemberToGcSuccess'),
         ];
     }
 }

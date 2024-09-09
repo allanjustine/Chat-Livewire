@@ -17,9 +17,16 @@ class Index extends Component
     #[On('echo:newUserAccount,NewUserRegister')]
     public function showAllUsers()
     {
-        $users = User::orderBy('created_at', 'desc')->get();
+        $users = User::with('roles')->orderBy('created_at', 'desc')->get();
 
         return compact('users');
+    }
+
+    public function assignRole($userId)
+    {
+        $user = User::find($userId);
+
+        $user->assignRole('user');
     }
 
     public function directVerified($id)
@@ -67,6 +74,21 @@ class Index extends Component
 
             return;
         }
+    }
+
+    public function setOfflineAll()
+    {
+        $users = User::all();
+
+        foreach($users as $user)
+        {
+            $user->update(['status' =>  'offline']);
+        }
+
+        $this->dispatch('toastr', [
+            'type'          =>          'success',
+            'message'       =>          'You successfully set all user status to offline',
+        ]);
     }
 
     public function render()

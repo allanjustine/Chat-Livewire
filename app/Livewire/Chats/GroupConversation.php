@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Chats;
 
+use App\Events\AddMemberToGroupChat;
 use App\Events\GroupChatIsSeen;
 use App\Events\IsSeen as SeenNow;
 use App\Events\GroupChatMessageSent;
@@ -10,6 +11,7 @@ use App\Models\Emoji;
 use App\Models\GroupChat;
 use App\Models\GroupChatContent;
 use App\Models\GroupChatMember;
+use App\Models\GroupChatReaction;
 use App\Models\User;
 use Illuminate\Support\Facades\URL;
 use Livewire\Attributes\Title;
@@ -39,6 +41,10 @@ class GroupConversation extends Component
     public $gc_nickname;
     public $inputEditNickname = false;
     public $toSeen;
+    public $emojis = [];
+    public $emojiReaction = [];
+    public $member = [];
+    public $search_member = '';
 
 
     use WithFileUploads;
@@ -51,11 +57,12 @@ class GroupConversation extends Component
     #[On('echo:sendMessage,MessageSent')]
     #[On('echo:groupChatMessage,GroupChatMessageSent')]
     #[On('echo:gcIsSeen,GroupChatIsSeen')]
+    #[On('echo:AddMemberToGcSuccess,AddMemberToGroupChat')]
     public function groupChats()
     {
         $user = auth()->user();
 
-        $convos = GroupChatContent::where('group_chat_id', $this->groupConvo->id)
+        $convos = GroupChatContent::with(['user', 'groupChatSeenBies', 'groupChatReactions.user', 'groupChatReactions.emoji'])->where('group_chat_id', $this->groupConvo->id)
             ->whereDoesntHave('groupChatDeletedBies', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
@@ -66,75 +73,6 @@ class GroupConversation extends Component
         foreach ($convos as $convo) {
             $convo->message = $this->escapeAndConvertUrlsToLinks($convo->message);
         }
-
-        $users = User::where(function ($query) {
-            $query->whereHas('senderChats', function ($query) {
-                $query->where('sender_id', auth()->user()->id)
-                    ->whereNotNull('message')
-                    ->orWhereNotNull('attachment');
-            })
-                ->orWhereHas('receiverChats', function ($query) {
-                    $query->where('receiver_id', auth()->user()->id)
-                        ->whereNotNull('message')
-                        ->orWhereNotNull('attachment');
-                });
-        })
-            ->where(function ($query) {
-                if ($this->search) {
-                    $query->where('name', 'like', '%' . $this->search . '%');
-                }
-            })
-            ->withCount(['unseenSenderChats' => function ($query) {
-                $query->where('is_seen', false);
-            }])
-            ->with(['senderChats' => function ($query) {
-                $query->whereNotNull('message')
-                    ->orWhereNotNull('attachment');
-            }, 'receiverChats' => function ($query) {
-                $query->whereNotNull('message')
-                    ->orWhereNotNull('attachment');
-            }])
-            ->get()
-            ->map(function ($user) {
-                $allChats = $user->receiverChats->concat($user->senderChats)
-                    ->filter(function ($chat) {
-                        return $chat->receiver_id === auth()->user()->id || $chat->sender_id === auth()->user()->id;
-                    })
-                    ->sortByDesc('created_at');
-                $latestChat = $allChats->first();
-                $user->latest_chat_created_at = $latestChat->created_at ?? null;
-                return $user;
-            });
-        $groupChats = GroupChat::with('groupChatMembers')
-            ->whereHas('groupChatMembers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->where(function ($query) {
-                $query->where('group_chat_name', 'like', '%' . $this->search . '%');
-            })
-            ->withCount(['groupChatContents as unseen_count' => function ($query) use ($user) {
-                $query->where('user_id', '!=', $user->id)
-                    ->whereDoesntHave('groupChatSeenBies', function ($subQuery) use ($user) {
-                        $subQuery->where('user_id', $user->id);
-                    });
-            }])
-            ->whereHas('groupChatContents')
-            ->get()
-            ->map(function ($groupChat) {
-                $latestChat = $groupChat->groupChatContents->sortByDesc('created_at')->first();
-                $groupChat->latest_chat_created_at = $latestChat->created_at ?? null;
-                return $groupChat;
-            });
-
-        $combined = $users->map(function ($user) {
-            $user->type = 'user';
-            return $user;
-        })->merge(
-            $groupChats->map(function ($groupChat) {
-                $groupChat->type = 'groupChat';
-                return $groupChat;
-            })
-        )->sortByDesc('latest_chat_created_at');
 
         $this->messageCount = GroupChatContent::where('group_chat_id', $this->groupConvo->id)
             ->whereDoesntHave('groupChatDeletedBies', function ($query) use ($user) {
@@ -165,10 +103,93 @@ class GroupConversation extends Component
 
         $lastUnseen = $unseenCount->where('user_id', '!=', $user->id)->last();
 
-        $emojis = Emoji::orderBy('id', 'asc')
+        return compact('convos', 'lastUnseen');
+    }
+
+    public function groupChatList()
+    {
+        $user = auth()->user();
+
+        $users = User::where(function ($query) use ($user) {
+            $query->whereHas('senderChats', function ($query) use ($user) {
+                $query->where('sender_id', $user->id)
+                    ->whereNotNull('message')
+                    ->orWhereNotNull('attachment');
+            })
+                ->orWhereHas('receiverChats', function ($query) use ($user) {
+                    $query->where('receiver_id', $user->id)
+                        ->whereNotNull('message')
+                        ->orWhereNotNull('attachment');
+                });
+        })
+            ->where(function ($query) {
+                if ($this->search) {
+                    $query->where('name', 'like', '%' . $this->search . '%');
+                }
+            })
+            ->withCount(['unseenSenderChats' => function ($query) {
+                $query->where('is_seen', false);
+            }])
+            ->with(['senderChats' => function ($query) {
+                $query->whereNotNull('message')
+                    ->orWhereNotNull('attachment');
+            }, 'receiverChats' => function ($query) {
+                $query->whereNotNull('message')
+                    ->orWhereNotNull('attachment');
+            }])
+            ->get()
+            ->map(function ($user) {
+                $allChats = $user->receiverChats->concat($user->senderChats)
+                    ->filter(function ($chat) use ($user) {
+                        return $chat->receiver_id === $user->id || $chat->sender_id === $user->id;
+                    })
+                    ->sortByDesc('created_at');
+                $latestChat = $allChats->first();
+                $user->latest_chat_created_at = $latestChat->created_at ?? null;
+                return $user;
+            });
+        $groupChats = GroupChat::whereHas('groupChatMembers', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->with('groupChatMembers')
+            ->where(function ($query) {
+                $query->where('group_chat_name', 'like', '%' . $this->search . '%');
+            })
+            ->withCount(['groupChatContents as unseen_count' => function ($query) use ($user) {
+                $query->where('user_id', '!=', $user->id)
+                    ->whereDoesntHave('groupChatSeenBies', function ($subQuery) use ($user) {
+                        $subQuery->where('user_id', $user->id);
+                    });
+            }])
+            ->whereHas('groupChatContents')
+            ->get()
+            ->map(function ($groupChat) {
+                $latestChat = $groupChat->groupChatContents->sortByDesc('created_at')->first();
+                $groupChat->latest_chat_created_at = $latestChat->created_at ?? null;
+                return $groupChat;
+            });
+
+        $combined = $users->map(function ($user) {
+            $user->type = 'user';
+            return $user;
+        })->merge(
+            $groupChats->map(function ($groupChat) {
+                $groupChat->type = 'groupChat';
+                return $groupChat;
+            })
+        )->sortByDesc('latest_chat_created_at');
+
+
+        $allUsers = User::whereNotIn('id', function ($query) {
+            $query->select('user_id')
+                ->from('group_chat_members')
+                ->where('group_chat_id', $this->groupConvo->id);
+        })
+            ->where(function ($query) {
+                $query->where('name', 'like', '%' . $this->search_member . '%');
+            })
             ->get();
 
-        return compact('convos', 'combined', 'lastUnseen', 'emojis');
+        return compact('combined', 'allUsers');
     }
 
     protected function escapeAndConvertUrlsToLinks($text)
@@ -198,19 +219,39 @@ class GroupConversation extends Component
             }
             $this->groupConvo = $gc;
         }
+
+        $this->emojis = Emoji::orderBy('id', 'asc')
+            ->get();
+
+        $this->emojiReaction = Emoji::whereIn('id', [7, 8, 14, 51, 52, 155, 1042])
+            ->get();
     }
 
     public function sendMessage()
     {
+        $user = auth()->user();
+        $groupId = $this->groupConvo->id;
+
+        $isMember = GroupChatMember::where('user_id', $user->id)
+            ->where('group_chat_id', $groupId)
+            ->exists();
+
+        if (!$isMember) {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Failed to send, You are not a member on this group chat',
+            ]);
+
+            return;
+        }
+
         if (empty($this->attachment)) {
 
             $this->validate([
                 'message'           =>              ['required', 'min:1'],
-                'attachment'        =>              ['nullable', 'max:102400']
+                'attachment'        =>              ['nullable', 'max:5120']
             ]);
         }
-
-        $groupId = $this->groupConvo->id;
 
         $notDuplicated = Str::random(10);
 
@@ -223,10 +264,11 @@ class GroupConversation extends Component
             $attachmentPaths[] = $attach->storeAs(path: 'public/gc/attachments', name: $fileName);
         }
 
-        auth()->user()->update(['status' => 'online']);
+
+        $user->update(['status' => 'online']);
 
         $chat = GroupChatContent::create([
-            'user_id'           =>              auth()->user()->id,
+            'user_id'           =>              $user->id,
             'group_chat_id'     =>              $groupId,
             'attachment'        =>              $attachmentPaths,
             'message'           =>              $this->message,
@@ -243,21 +285,24 @@ class GroupConversation extends Component
 
     public function sendLike()
     {
+        $user = auth()->user();
 
         $groupId = $this->groupConvo->id;
 
         $attachmentPaths = [];
 
-        auth()->user()->update(['status' => 'online']);
+        $user->update(['status' => 'online']);
 
         $chat = GroupChatContent::create([
-            'user_id'           =>              auth()->user()->id,
+            'user_id'           =>              $user->id,
             'group_chat_id'     =>              $groupId,
             'attachment'        =>              $attachmentPaths,
             'message'           =>              '(y)'
         ]);
 
         event(new GroupChatMessageSent($chat));
+
+        $this->dispatch('scrollBot');
     }
 
     public function removeForEveryone($convoId)
@@ -282,6 +327,8 @@ class GroupConversation extends Component
 
     public function deleteForYou($convoId)
     {
+        $user = auth()->user();
+
         $chat = GroupChatContent::find($convoId);
 
         if (!$chat) {
@@ -292,7 +339,7 @@ class GroupConversation extends Component
 
             return;
         } else {
-            $chat->groupChatDeletedBies()->attach(auth()->user()->id);
+            $chat->groupChatDeletedBies()->attach($user->id);
         }
     }
 
@@ -307,7 +354,7 @@ class GroupConversation extends Component
 
     public function update()
     {
-
+        $user = auth()->user();
         if (!$this->toEdit) {
             $this->dispatch('toastr', [
                 'type'          =>          'error',
@@ -315,7 +362,7 @@ class GroupConversation extends Component
             ]);
 
             return;
-        } elseif ($this->toEdit->user_id != auth()->user()->id) {
+        } elseif ($this->toEdit->user_id != $user->id) {
             $this->dispatch('toastr', [
                 'type'          =>          'error',
                 'message'       =>          'You cannot update users message',
@@ -401,8 +448,10 @@ class GroupConversation extends Component
 
     public function seen($userId)
     {
+        $receiverUser = auth()->user()->id;
+
         $isSeen = Chat::where('sender_id', $userId)
-            ->where('receiver_id', auth()->user()->id)
+            ->where('receiver_id',  $receiverUser)
             ->where('is_seen', false)
             ->update([
                 'is_seen'       =>      true
@@ -429,6 +478,8 @@ class GroupConversation extends Component
 
     public function leaveGc($groupConvoId)
     {
+        $userId = auth()->user()->id;
+
         $groupC = GroupChat::find($groupConvoId);
 
         if (!$groupC) {
@@ -437,14 +488,65 @@ class GroupConversation extends Component
                 'message'       =>          'You already leave this group chat',
             ]);
         } else {
-            $groupC->groupChatMembers()->detach(auth()->user()->id);
+            $groupC->groupChatMembers()->detach($userId);
 
             return $this->redirect('/chats', navigate: true);
         }
     }
 
+    public function handleEmojiClick($emojiId, $convoId)
+    {
+        $user = auth()->user();
+
+        $reaction = GroupChatReaction::where('user_id', $user->id)
+            ->where('emoji_id', $emojiId)
+            ->where('group_chat_content_id', $convoId)
+            ->first();
+
+        if ($reaction) {
+            $reaction->delete();
+
+            $remainingReactions = GroupChatReaction::where('group_chat_content_id', $convoId)->count();
+
+            if ($remainingReactions === 0) {
+                $this->dispatch('closeModal', ['convoId' => $convoId]);
+            }
+        } else {
+            GroupChatReaction::updateOrCreate([
+                'user_id'                           =>              $user->id,
+                'emoji_id'                          =>              $emojiId,
+                'group_chat_content_id'             =>              $convoId
+            ]);
+        }
+    }
+
+    public function addMemberToGc()
+    {
+
+        $this->validate([
+            'member'            =>              ['required']
+        ]);
+
+        $this->groupConvo->groupChatMembers()->attach($this->member);
+
+        $this->dispatch('toastr', [
+            'type'          =>          'success',
+            'message'       =>          count($this->member) . (count($this->member) <= 1 ? ' user added successfully' : ' users added successfully'),
+        ]);
+
+        event(new AddMemberToGroupChat($this->member));
+
+        $this->reset(['member', 'search_member']);
+
+        $this->dispatch('closeModal');
+    }
+
     public function render()
     {
-        return view('livewire.chats.group-conversation', $this->groupChats());
+        return view(
+            'livewire.chats.group-conversation',
+            $this->groupChats(),
+            $this->groupChatList()
+        );
     }
 }

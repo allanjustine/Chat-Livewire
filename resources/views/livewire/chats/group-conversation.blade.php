@@ -7,7 +7,7 @@
         x-on:livewire-upload-error="uploading = false"
         x-on:livewire-upload-progress="progress = $event.detail.progress">
         <div class="overlay" x-show='dropingFile'></div>
-        <div wire:ignore.self class="offcanvas offcanvas-start bg-dark text-white overflow-y-auto"
+        <div wire:ignore.self class="offcanvas offcanvas-start bg-dark text-white overflow-y-auto mt-1"
             data-bs-backdrop="static" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
             <div class="offcanvas-header py-3 sticky-top bg-dark text-white">
                 <div class="offcanvas-title" id="staticBackdropLabel">
@@ -21,7 +21,7 @@
             <ul class="list-group">
                 {{-- <a href="/gc/" wire:navigate class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center bg-secondary text-white">
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">John Doe</span>
                     </li>
@@ -34,12 +34,12 @@
                     class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center bg-secondary text-white">
                         <span class="online-dot"></span>
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="Group Chat Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $item->group_chat_name }}</span>
                         @if ($item->unseen_count > 0)
                         <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">
-                            {{ $item->unseen_count }}
+                            {{ $item->unseen_count > 9 ? '9+' : $item->unseen_count }}
                         </span>
                         @endif
                     </li>
@@ -58,11 +58,11 @@
                         <span class="offline-dot"></span>
                         @endif
                         <img src="{{ $item->profile_picture ? Storage::url($item->profile_picture) : '/images/profile.png' }}"
-                            width="35" height="35" alt="Profile Image" class="rounded-circle">
+                            width="25" height="25" alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $item->name }}</span>
                         @if ($item->unseen_sender_chats_count > 0)
                         <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">
-                            {{ $item->unseen_sender_chats_count }}
+                            {{ $item->unseen_sender_chats_count > 9 ? '9+' : $item->unseen_sender_chats_count }}
                         </span>
                         @endif
                     </li>
@@ -82,7 +82,7 @@
                 <a wire:click='seen({{ $gc->id }})' href="/gc/{{ $gc->group_chat_token }}" wire:navigate
                     class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center bg-secondary text-white">
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $gc->group_chat_name }}</span>
                         @if ($gc->unseen_count > 0)
@@ -104,7 +104,7 @@
 
             </ul>
         </div>
-        <div class="col-3 bg-light overflow-auto d-none d-md-block bg-dark">
+        <div class="col-md-3 bg-light overflow-auto d-none d-md-block bg-dark">
             <div class="py-3 px-2 sticky-top bg-dark">
                 <h3>Chats</h3>
                 <input type="search" class="form-control" placeholder="Search conversation..."
@@ -113,7 +113,7 @@
             <ul class="list-group">
                 {{-- <a href="/gc/" wire:navigate class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center bg-secondary text-white">
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">John Doe</span>
                     </li>
@@ -123,7 +123,7 @@
                 <a wire:click='seen({{ $gc->id }})' href="/gc/{{ $gc->group_chat_token }}" wire:navigate
                     class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center bg-secondary text-white">
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $gc->group_chat_name }}</span>
                         @if ($gc->unseen_count > 0)
@@ -149,12 +149,12 @@
                     class="mt-1 text-decoration-none rounded shadow mx-1">
                     <li class="list-group-item d-flex align-items-center bg-secondary text-white">
                         <span class="online-dot"></span>
-                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="35" height="35"
+                        <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="Group Chat Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $item->group_chat_name }}</span>
                         @if ($item->unseen_count > 0)
                         <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">
-                            {{ $item->unseen_count }}
+                            {{ $item->unseen_count > 9 ? '9+' : $item->unseen_count }}
                         </span>
                         @endif
                     </li>
@@ -173,11 +173,11 @@
                         <span class="offline-dot"></span>
                         @endif
                         <img src="{{ $item->profile_picture ? Storage::url($item->profile_picture) : '/images/profile.png' }}"
-                            width="35" height="35" alt="Profile Image" class="rounded-circle">
+                            width="25" height="25" alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $item->name }}</span>
                         @if ($item->unseen_sender_chats_count > 0)
                         <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">
-                            {{ $item->unseen_sender_chats_count }}
+                            {{ $item->unseen_sender_chats_count > 9 ? '9+' : $item->unseen_sender_chats_count }}
                         </span>
                         @endif
                     </li>
@@ -223,12 +223,14 @@
                                 </button>
                             </li>
                             <li>
-                                <button class="dropdown-item btn btn-link text-decoration-none" href="#">
+                                <button type="button" class="dropdown-item btn btn-link text-decoration-none"
+                                    data-bs-toggle="modal" data-bs-target="#addMembersGc">
                                     <div class="d-flex">
                                         <span class="col-2"><i class="far fa-user-plus"></i></span>
                                         <span class="col-10"><strong>Add Members</strong></span>
                                     </div>
                                 </button>
+
                             </li>
                             <li>
                                 <button class="dropdown-item btn btn-link text-decoration-none">
@@ -263,7 +265,7 @@
             {{-- All Members Modal --}}
             <div wire:ignore.self class="modal fade" id="allMembers" tabindex="-1" aria-labelledby="allMembersLabel"
                 aria-hidden="true">
-                <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content bg-secondary">
                         <div class="modal-header">
                             <h1 class="modal-title fs-5 text-white" id="allMembersLabel">All Members</h1>
@@ -272,8 +274,14 @@
                         </div>
                         <div class="modal-body">
                             <ul class="list-group border-0">
+                                @php
+                                $isAuthenticatedUserAdmin = $groupConvo->groupChatMembers->contains(function($member) {
+                                return auth()->user()->id === $member->id && $member->pivot->is_admin;
+                                });
+                                @endphp
                                 @foreach($groupConvo->groupChatMembers as $member)
-                                <li class="list-group-item bg-secondary border-0 d-flex align-items-center">
+                                <li class="list-group-item bg-secondary border-0 d-flex align-items-center"
+                                    title="{{ $member->name }}">
                                     <img @if($member->profile_picture === null)
                                     src="/images/profile.png"
                                     @else
@@ -295,7 +303,10 @@
                                     </div>
                                     @else
                                     <span class="text-white"><strong>{{ $member->pivot->gc_nickname ?: $member->name
-                                            }}</strong></span>
+                                            }}</strong> <span
+                                            class="{{ $member->pivot->is_admin ? 'badge text-bg-primary' : 'badge text-bg-dark' }}"
+                                            style="font-size: 8px !important;">{{ $member->pivot->is_admin ? 'Admin' :
+                                            'Member' }}</span></span>
                                     @endif
                                     <div class="d-flex ms-auto gap-1">
                                         @if ($inputEditNickname === true && $editNickname->id === $member->pivot->id)
@@ -311,10 +322,12 @@
                                             <span class="d-none d-md-block">Edit</span>
                                         </button>
                                         @endif
-                                        {{-- <button class="btn btn-danger btn-sm d-flex gap-1">
-                                            <span><i class="far fa-trash"></i></span>
-                                            <span class="d-none d-md-block">Remove</span>
-                                        </button> --}}
+                                        @if ($isAuthenticatedUserAdmin && auth()->user()->id !== $member->id)
+                                        <button class="btn btn-danger btn-sm d-flex gap-1">
+                                            <span><i class="far fa-xmark"></i></span>
+                                            <span class="d-none d-md-block">Kick</span>
+                                        </button>
+                                        @endif
                                     </div>
                                 </li>
                                 @endforeach
@@ -324,6 +337,70 @@
                             <button type="button" class="btn btn-dark" data-bs-dismiss="modal"
                                 wire:click='closeNicknameEdit'>Close</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+
+            {{-- Add Members To Gc Modal --}}
+
+            <div wire:ignore.self class="modal" id="addMembersGc" tabindex="-1" aria-labelledby="addMembersGcLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content bg-secondary">
+                        <form wire:submit.prevent='addMemberToGc'>
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 text-white" id="addMembersGcLabel">Add Members to Group Chat
+                                </h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="px-2">
+                                    <h6 class="text-white">Select Members</h6>
+                                    <input class="form-control" id="group-search" type="search" placeholder="Search..."
+                                        wire:model.live.debounce.500ms='search_member'>
+                                    <div class="form-group mb-1">
+                                        <hr>
+                                        <div id="checkboxes-container" class="overflow-auto" style="max-height: 300px;">
+                                            @forelse ($allUsers as $user)
+                                            <div class="form-check" id='formCheck'>
+                                                <input class="form-check-input mt-3" type="checkbox"
+                                                    id="user-{{ $user->id }}" value="{{ $user->id }}"
+                                                    wire:model="member">
+                                                <img @if($user->profile_picture === null)
+                                                src="/images/profile.png"
+                                                @else
+                                                src='{{ Storage::url($user->profile_picture) }}'
+                                                @endif
+                                                alt="{{ $user->name }}"
+                                                class="rounded-circle me-2" width="40" height="40">
+                                                <label class="form-check-label text-white fs-6 fw-bolder"
+                                                    for="user-{{ $user->id }}">
+                                                    {{ $user->name }}
+                                                </label>
+                                            </div>
+                                            <hr>
+                                            @empty
+                                            <p class="text-white">@if($search_member)No "{{ $search_member }}" user
+                                                found. @else
+                                                No @if($search) "{{ $search }}" @endif user found. @endif</p>
+                                            @endforelse
+                                        </div>
+                                        @error('member')
+                                        <span class="text-danger">To proceed, Please select atleast 1 person.</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span wire:loading.remove wire:target='addMemberToGc'>Add</span>
+                                    <span wire:loading wire:target='addMemberToGc'>Adding...</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -346,7 +423,7 @@
 
                 @if ($convo->user_id === auth()->user()->id)
                 @if (!empty($convo->message) || !empty($convo->attachment))
-                <div class="p-2" style="font-size: 13px;">
+                <div class="p-2 mb-2" style="font-size: 13px;">
                     <div class="d-flex justify-content-end">
                         @if ($convo->status === 'unsent')
                         <div class="dropdown mt-2 ms-2 drop-set">
@@ -366,9 +443,10 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="border shadow p-2 me-2 rounded-start-4 rounded-bottom-4 justify-content-end"
+                        <div style="background-color: rgba(29, 29, 29, 0.386);"
+                            class="border shadow p-2 me-2 rounded-start-4 rounded-bottom-4 justify-content-end"
                             title="{{ $convo->created_at->format('l, g:i A') }}">
-                            <span class="fst-italic text-muted mt-2" style='font-size: 12px;'>
+                            <span class="fst-italic mt-2" style='font-size: 12px; color:rgb(232, 178, 178);'>
                                 {{ auth()->user()->id ? 'You unsent a message' : 'Message unsent' }}
                             </span>
                         </div>
@@ -420,33 +498,27 @@
                                 id="dropdownMenuButton{{ $convo->id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="far fa-smile text-white"></i>
                             </button>
-                            {{-- <ul class="dropdown-menu dropdown-menu-end shadow drop-set-menu" id="dropdrop"
-                                style="width: 300px; max-height: 300px; overflow: auto;"
+                            <ul class="dropdown-menu dropdown-menu-end shadow drop-set-menu"
+                                style="width: 260px; overflow: auto;"
                                 aria-labelledby="dropdownMenuButton{{ $convo->id }}">
                                 <li class="px-2">
-                                    <div class="my-3">
-                                        <input type="search" class="form-control" placeholder="Search emoji"
-                                            id="search-emoji">
-                                    </div>
-                                    <div class="d-flex flex-wrap justify-content-center align-items-center"
-                                        id="emoji-list">
-                                        @forelse ($emojis as $emoji)
-                                        <span class="emoji-item fs-4" data-label="{{ $emoji->label }}"
-                                            style="cursor: pointer;">{{ $emoji->value }}</span>
-                                        @empty
-                                        <div>
-                                            <i class="far fa-face-thinking"></i>
-                                            <span class="emoji-item fs-6" style="cursor: pointer;">No emoji
-                                                displayed</span>
-                                        </div>
-                                        @endforelse
-                                    </div>
-                                    <div class="py-5" id="no-emoji-found" style="display: none; text-align: center;">
-                                        <i class="far fa-face-thinking"></i>
-                                        <span id="no-emoji-message" class="fs-6"></span>
+                                    <div>
+                                        @foreach ($emojiReaction as $emoji)
+                                        @php
+                                        $userReaction = $convo->groupChatReactions->first(function($reaction) use
+                                        ($emoji) {
+                                        return $reaction->emoji->id === $emoji->id && $reaction->user_id ===
+                                        auth()->id();
+                                        });
+                                        @endphp
+                                        <button type="button" class="btn m-0 p-0 fs-4 btn-link text-decoration-none"
+                                            style="{{ $userReaction ? 'background-color: rgba(156, 151, 151, 0.500); color: white;' : '' }}"
+                                            wire:click="handleEmojiClick({{ $emoji->id }}, {{ $convo->id }})">{{
+                                            $emoji->value }}</button>
+                                        @endforeach
                                     </div>
                                 </li>
-                            </ul> --}}
+                            </ul>
                         </div>
                         <div wire:ignore class="modal" id="toEditMessage" tabindex="-1"
                             aria-labelledby="toEditMessageLabel" aria-hidden="true">
@@ -478,8 +550,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="border p-2 me-2 rounded-start-4 rounded-bottom-4 justify-content-end shadow"
-                            title="{{ $convo->created_at->format('l, g:i A') }}" style="max-width: 85%;">
+                        <div class="border position-relative p-2 me-2 rounded-start-4 rounded-bottom-4 justify-content-end shadow"
+                            title="{{ $convo->created_at->format('l, g:i A') }}"
+                            style="max-width: 85%; background-color: rgba(29, 29, 29, 0.386);">
 
                             {{-- Display the message if it exists --}}
                             @if (!empty($convo->message))
@@ -533,12 +606,15 @@
                                 @endforeach
                             </p>
                             @endif
-                            <small>@if ($convo->created_at->diffForHumans() < 1) Just now @else {{ $convo->
-                                    created_at->diffForHumans() }} @endif</small>
-                            <p class="mx-0 mb-0 mt-2 d-flex justify-content-end">
+                            <small>
+                                @if ($convo->created_at->diffForHumans() < 1) Just now @else {{ $convo->
+                                    created_at->diffForHumans() }}
+                                    @endif
+                            </small>
+                            <span class="mx-0 mb-0 d-flex justify-content-end">
                                 @if (!empty($convo->groupChatSeenBies) && $loop->first)
                                 @foreach ($convo->groupChatSeenBies as $seenBy)
-                                <img style="margin-left: -4px; margin-bottom: -20px;" @if ($seenBy->profile_picture ===
+                                <img style="margin-left: -4px;" @if ($seenBy->profile_picture ===
                                 null)
                                 src='/images/profile.png'
                                 @else
@@ -546,16 +622,96 @@
                                 @endif
                                 width='15'
                                 height='15'
-                                class='rounded-circle'
+                                class='rounded-circle animate__animated animate__wobble'
                                 alt="{{ $seenBy->name }}"
                                 title='{{ $seenBy->name }}'
                                 >
                                 @endforeach
                                 @endif
-                            </p>
+                            </span>
+                            <div class="position-absolute" style="bottom: -17px; right: 0; width: 300px;">
+                                <div class="d-flex justify-content-end">
+                                    @php
+                                    $groupedReactions = $convo->groupChatReactions->groupBy(function($reaction) {
+                                    return $reaction->emoji->value;
+                                    })->map(function($group) {
+
+                                    return $group;
+                                    });
+                                    @endphp
+                                    @foreach ($groupedReactions as $emoji => $group)
+                                    {{-- @if ($click = $group->first())
+                                    <div style="background-color: #3333338c;" class="fs-6 px-1 rounded-pill"><span
+                                            style="cursor: pointer;"
+                                            wire:click='handleEmojiClick({{ $click->emoji_id }}, {{ $click->chat_id }})'>{{
+                                            $emoji }}</span><span class="">@if($group->count() > 1) ({{ $group->count()
+                                            }}) @endif</span> </div>
+                                    @endif --}}
+                                    <div data-bs-toggle="modal" data-bs-target="#reactionsModal{{ $convo->id }}"
+                                        style="background-color: #3333338c; cursor: pointer;"
+                                        class="fs-6 px-1 rounded-pill animate__animated animate__heartBeat">
+                                        <span>{{ $emoji }}</span>
+                                        <span class="">@if($group->count() > 1) {{ $group->count() }} @endif</span>
+                                    </div>
+                                    <div wire:ignore.self class="modal fade" id="reactionsModal{{ $convo->id }}"
+                                        tabindex="-1" aria-labelledby="reactionsModal{{ $convo->id }}Label"
+                                        aria-hidden="true">
+                                        <div
+                                            class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm">
+                                            <div class="bg-secondary modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5"
+                                                        id="reactionsModal{{ $convo->id }}Label">Reactions</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-0">
+                                                    @foreach ($convo->groupChatReactions as $reaction)
+                                                    <div id="reaction_content"
+                                                        class="d-flex justify-content-between align-items-start rounded p-2 m-2"
+                                                        @if($reaction->user_id === auth()->user()->id)
+                                                        wire:click='handleEmojiClick({{ $reaction->emoji_id }}, {{
+                                                        $convo->id }})' style="cursor: pointer;" @endif>
+                                                        <div class="d-flex align-items-center">
+                                                            <img @if ($reaction->user->profile_picture === null)
+                                                            src="/images/profile.png"
+                                                            @else
+                                                            src="{{ Storage::url($reaction->user->profile_picture) }}"
+                                                            @endif
+                                                            alt="{{ $reaction->user->name }}" width="25" height="25"
+                                                            class="rounded-circle me-2">
+                                                            <div>
+                                                                <div>{{ $reaction->user->groupChats->firstWhere('id',
+                                                                    $groupConvo->id)?->pivot->gc_nickname ?:
+                                                                    $reaction->user->name }}</div>
+                                                                @if ($reaction->user_id === auth()->user()->id)
+                                                                <div class="text-light fst-italic"
+                                                                    style="font-size: 0.85rem;">Tap to remove reaction
+                                                                </div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                        <div @if($reaction->user_id === auth()->user()->id) class="mt-3"
+                                                            @endif>
+                                                            {{ $reaction->emoji->value }}
+                                                        </div>
+                                                    </div>
+                                                    @endforeach
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                         @endif
-                        <a href="/profile-info/{{ $convo->user->username }}" wire:navigate>
+                        <a title="{{ $convo->user->name }}" href="/profile-info/{{ $convo->user->username }}"
+                            wire:navigate>
                             <img @if ($convo->user->profile_picture === null)
                             src="/images/profile.png"
                             @else
@@ -571,10 +727,11 @@
                 @else
                 {{-- Display the message with attachments --}}
                 @if (!empty($convo->attachment) || !empty($convo->message))
-                <div class="p-2" style="font-size: 13px;">
+                <div class="p-2 mb-2" style="font-size: 13px;">
                     <div class="d-flex">
                         {{-- Profile Image --}}
-                        <a href="/profile-info/{{ $convo->user->username }}" wire:navigate>
+                        <a href="/profile-info/{{ $convo->user->username }}" wire:navigate
+                            title="{{ $convo->user->name }}">
                             <img @if ($convo->user->profile_picture === null)
                             src="/images/profile.png"
                             @else
@@ -584,19 +741,21 @@
                             class="rounded-circle"></a>
 
                         {{-- Message and Attachments --}}
-                        <div class="border p-2 ms-2 rounded-end-4 rounded-bottom-4 shadow"
-                            title="{{ $convo->created_at->format('l, g:i A') }}" style="max-width: 85%;">
+                        <div class="position-relative border p-2 ms-2 rounded-end-4 rounded-bottom-4 shadow"
+                            title="{{ $convo->created_at->format('l, g:i A') }}"
+                            style="max-width: 85%; background-color: rgba(29, 29, 29, 0.386);">
                             {{-- <strong>{{ $convo->user->name }}</strong> --}}
-                            @php
+                            {{-- @php
                             $groupChat = $convo->user->groupChats->firstWhere('id', $convo->group_chat_id);
 
                             $displayName = $groupChat?->pivot->gc_nickname ?: $convo->user->name;
-                            @endphp
-                            <strong>{{ $displayName }}</strong>
+                            @endphp --}}
+                            <strong title="{{ $convo->user->name }}">{{ $convo->user->groupChats->firstWhere('id',
+                                $convo->group_chat_id)?->pivot->gc_nickname ?: $convo->user->name }}</strong>
                             {{-- If message is unsent --}}
                             @if ($convo->status === 'unsent')
                             <p class="text-break">
-                                <span class="fst-italic text-muted mt-2" style='font-size: 12px;'>
+                                <span class="fst-italic mt-2" style='font-size: 12px; color:rgb(232, 178, 178);'>
                                     Message unsent
                                 </span>
                             </p>
@@ -653,12 +812,15 @@
                             </p>
                             @endif
                             @endif
-                            <small>@if ($convo->created_at->diffForHumans() < 1) Just now @else {{ $convo->
-                                    created_at->diffForHumans() }} @endif</small>
-                            <p class="mx-0 mb-0 mt-2 d-flex">
+                            <small>
+                                @if ($convo->created_at->diffForHumans() < 1) Just now @else {{ $convo->
+                                    created_at->diffForHumans() }}
+                                    @endif
+                            </small>
+                            <span class="mx-0 mb-0 d-flex">
                                 @if (!empty($convo->groupChatSeenBies) && $loop->first)
                                 @foreach ($convo->groupChatSeenBies as $seenBy)
-                                <img style="margin-left: -4px; margin-bottom: -20px;" @if ($seenBy->profile_picture ===
+                                <img style="margin-left: -4px;" @if ($seenBy->profile_picture ===
                                 null)
                                 src='/images/profile.png'
                                 @else
@@ -666,46 +828,119 @@
                                 @endif
                                 width='15'
                                 height='15'
-                                class='rounded-circle'
+                                class='rounded-circle animate__animated animate__wobble'
                                 alt="{{ $seenBy->name }}"
                                 title='{{ $seenBy->name }}'
                                 >
                                 @endforeach
                                 @endif
-                            </p>
+                            </span>
+                            <div class="position-absolute" style="bottom: -17px; left: 0; width: 300px;">
+                                <div class="d-flex">
+                                    @php
+                                    $groupedReactions = $convo->groupChatReactions->groupBy(function($reaction) {
+                                    return $reaction->emoji->value;
+                                    })->map(function($group) {
+
+                                    return $group;
+                                    });
+                                    @endphp
+                                    @foreach ($groupedReactions as $emoji => $group)
+                                    {{-- @if ($click = $group->first())
+                                    <div style="background-color: #3333338c;" class="fs-6 px-1 rounded-pill">
+                                        <span style="cursor: pointer;"
+                                            wire:click='handleEmojiClick({{ $click->emoji_id }}, {{ $click->chat_id }})'>{{
+                                            $emoji }}</span>
+                                        <span class="">@if($group->count() > 1) ({{ $group->count() }}) @endif</span>
+                                    </div>
+                                    @endif --}}
+                                    <div data-bs-toggle="modal" data-bs-target="#reactionsModal{{ $convo->id }}"
+                                        style="background-color: #3333338c; cursor: pointer;"
+                                        class="fs-6 px-1 rounded-pill animate__animated animate__heartBeat">
+                                        <span>{{ $emoji }}</span>
+                                        <span class="">@if($group->count() > 1) {{ $group->count() }} @endif</span>
+                                    </div>
+                                    <div wire:ignore.self class="modal fade" id="reactionsModal{{ $convo->id }}"
+                                        tabindex="-1" aria-labelledby="reactionsModal{{ $convo->id }}Label"
+                                        aria-hidden="true">
+                                        <div
+                                            class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm">
+                                            <div class="bg-secondary modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5"
+                                                        id="reactionsModal{{ $convo->id }}Label">Reactions</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-0">
+                                                    @foreach ($convo->groupChatReactions as $reaction)
+                                                    <div id="reaction_content"
+                                                        class="d-flex justify-content-between align-items-start rounded p-2 m-2"
+                                                        @if($reaction->user_id === auth()->user()->id)
+                                                        wire:click='handleEmojiClick({{ $reaction->emoji_id }}, {{
+                                                        $convo->id }})' style="cursor: pointer;" @endif>
+                                                        <div class="d-flex align-items-center">
+                                                            <img @if ($reaction->user->profile_picture === null)
+                                                            src="/images/profile.png"
+                                                            @else
+                                                            src="{{ Storage::url($reaction->user->profile_picture) }}"
+                                                            @endif
+                                                            alt="{{ $reaction->user->name }}" width="25" height="25"
+                                                            class="rounded-circle me-2">
+                                                            <div>
+                                                                <div>{{ $reaction->user->groupChats->firstWhere('id',
+                                                                    $groupConvo->id)?->pivot->gc_nickname ?:
+                                                                    $reaction->user->name }}</div>
+                                                                @if ($reaction->user_id === auth()->user()->id)
+                                                                <div class="text-light fst-italic"
+                                                                    style="font-size: 0.85rem;">Tap to remove reaction
+                                                                </div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                        <div @if($reaction->user_id === auth()->user()->id) class="mt-3"
+                                                            @endif>
+                                                            {{ $reaction->emoji->value }}
+                                                        </div>
+                                                    </div>
+                                                    @endforeach
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                         <div class="dropstart mt-2 drop-set">
                             <button class="btn btn-sm btn-link text-decoration-none" type="button"
                                 id="dropdownMenuButton{{ $convo->id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="far fa-smile text-white"></i>
                             </button>
-                            {{-- <ul class="dropdown-menu dropdown-menu-end shadow drop-set-menu" id="dropdrop"
-                                style="width: 300px; max-height: 300px; overflow: auto;"
+                            <ul class="dropdown-menu shadow drop-set-menu" style="width: 260px; overflow: auto;"
                                 aria-labelledby="dropdownMenuButton{{ $convo->id }}">
                                 <li class="px-2">
-                                    <div class="my-3">
-                                        <input type="search" class="form-control" placeholder="Search emoji"
-                                            id="search-emoji">
-                                    </div>
-                                    <div class="d-flex flex-wrap justify-content-center align-items-center"
-                                        id="emoji-list">
-                                        @forelse ($emojis as $emoji)
-                                        <span class="emoji-item fs-4" data-label="{{ $emoji->label }}"
-                                            style="cursor: pointer;">{{ $emoji->value }}</span>
-                                        @empty
-                                        <div>
-                                            <i class="far fa-face-thinking"></i>
-                                            <span class="emoji-item fs-6" style="cursor: pointer;">No emoji
-                                                displayed</span>
-                                        </div>
-                                        @endforelse
-                                    </div>
-                                    <div class="py-5" id="no-emoji-found" style="display: none; text-align: center;">
-                                        <i class="far fa-face-thinking"></i>
-                                        <span id="no-emoji-message" class="fs-6"></span>
+                                    <div>
+                                        @foreach ($emojiReaction as $emoji)
+                                        @php
+                                        $userReaction = $convo->groupChatReactions->first(function($reaction) use
+                                        ($emoji) {
+                                        return $reaction->emoji->id === $emoji->id && $reaction->user_id ===
+                                        auth()->id();
+                                        });
+                                        @endphp
+                                        <button type="button" class="btn m-0 p-0 fs-4 btn-link text-decoration-none"
+                                            style="{{ $userReaction ? 'background-color: rgba(156, 151, 151, 0.500); color: white;' : '' }}"
+                                            wire:click="handleEmojiClick({{ $emoji->id }}, {{ $convo->id }})">{{
+                                            $emoji->value }}</button>
+                                        @endforeach
                                     </div>
                                 </li>
-                            </ul> --}}
+                            </ul>
                         </div>
                         <div class="dropdown mt-2 drop-set">
                             <button class="btn btn-sm btn-link text-decoration-none" type="button"
@@ -767,6 +1002,7 @@
                                         </div>
                                         @endforeach
                                     </div>
+                                    @if (count($convo->attachment) > 1)
                                     <button class="carousel-control-prev" type="button"
                                         data-bs-target="#carouselExample{{$convo->id}}" data-bs-slide="prev">
                                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -777,6 +1013,7 @@
                                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Next</span>
                                     </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -929,7 +1166,7 @@
                                     <div class="dropup mt-1 dropup">
                                         <button class="btn btn-lg pe-0" id="btn-emoji" type="button"
                                             data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
-                                             type="button">😄</button>
+                                            type="button">😄</button>
                                         <ul class="dropdown-menu" id="dropdrop"
                                             style="width: 300px; max-height: 300px; overflow: auto;">
                                             <li class="px-2">
@@ -1067,6 +1304,30 @@
         #btn-emoji {
             border: none !important;
         }
+
+        #reaction_content:hover {
+            background-color: #3131315a;
+        }
+
+        #group-search {
+            background-color: #999999 !important;
+            color: #f5f5f5 !important;
+            border: none !important;
+            transition: opacity 0.3s ease;
+        }
+
+        #group-search::placeholder {
+            color: white !important;
+            transition: opacity 0.3s ease;
+        }
+
+        #formCheck label {
+            cursor: pointer;
+        }
+
+        #formCheck input {
+            cursor: pointer;
+        }
     </style>
 
     <script>
@@ -1145,6 +1406,7 @@
             if (!isMediumOrLarger() && !event.shiftKey) {
                 event.preventDefault();
                 @this.call('sendMessage');
+                document.getElementById('textarea').focus();
             }
         }
 
@@ -1183,12 +1445,20 @@
 
     <script>
         document.addEventListener('livewire:navigated', function () {
-        @this.on('closeModal', () => {
-            $('#toEditMessage').modal('hide');
+            @this.on('closeModal', (data) => {
+                const eventData = Array.isArray(data) ? data[0] : data;
+                $('#toEditMessage').modal('hide');
+                $('#addMembersGc').modal('hide');
+                $(`#reactionsModal${eventData.convoId}`).modal('hide');
 
-            document.getElementById('toEditMessage').classList.remove('show');
+                document.getElementById('toEditMessage').classList.remove('show');
+                document.getElementById('addMembersGc').classList.remove('show');
+                const reactionsModal = document.getElementById(`reactionsModal${eventData.convoId}`);
+                if (reactionsModal) {
+                    reactionsModal.classList.remove('show');
+                }
+            });
         });
-    });
     </script>
     <script>
         function drop_file_component() {

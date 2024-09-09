@@ -20,14 +20,17 @@ Route::get('/login', Login::class);
 Route::get('/register', Register::class);
 Route::fallback(Login::class);
 
-Route::group(['middleware' => ['auth', 'verified']], function () {
+Route::group(['middleware' => ['auth', 'verified', 'role:user|admin']], function () {
     Route::get('/chats', Index::class);
     Route::get('/chats/{userToken}', Conversation::class);
     Route::get('/home', Home::class);
-    Route::get('/users', UsersIndex::class);
     Route::get('/profile', Profile::class);
     Route::get('/profile-info/{username}', ProfileInfo::class);
     Route::get('/gc/{groupChatToken}', GroupConversation::class);
     Route::get('/announcement', Announcement::class);
     Route::get('/updates/{postTitle}', AnnouncementSingle::class);
+});
+
+Route::group(['middleware' => ['auth', 'verified', 'role:admin']], function () {
+    Route::get('/admin/users', UsersIndex::class);
 });

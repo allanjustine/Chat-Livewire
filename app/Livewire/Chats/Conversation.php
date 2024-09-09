@@ -6,6 +6,7 @@ use App\Events\GroupChatIsSeen;
 use App\Events\MessageSent;
 use App\Events\IsSeen as SeenNow;
 use App\Models\Chat;
+use App\Models\ChatReaction;
 use App\Models\Emoji;
 use App\Models\GroupChat;
 use App\Models\User;
@@ -32,8 +33,10 @@ class Conversation extends Component
     public $rowCount = 1;
     public $activeImageIndex = 0;
     public $toSeen;
+    public $emojis = [];
+    public $emojiReaction = [];
 
-    #[Validate(['nullable', 'max:102400'])]
+    #[Validate(['nullable', 'max:5120'])]
     public $attachment = [];
 
     #[Validate(['required', 'min:1'])]
@@ -50,82 +53,14 @@ class Conversation extends Component
     #[On('echo:groupChatMessage,GroupChatMessageSent')]
     #[On('echo:sendMessage,MessageSent')]
     #[On('echo:isSeen,IsSeen')]
+    #[On('echo:AddMemberToGcSuccess,AddMemberToGroupChat')]
     public function conversation()
     {
         $user = auth()->user();
 
         $userId = $user->id;
 
-        $users = User::where(function ($query) {
-            $query->whereHas('senderChats', function ($query) {
-                $query->where('sender_id', auth()->user()->id)
-                    ->whereNotNull('message')
-                    ->orWhereNotNull('attachment');
-            })
-                ->orWhereHas('receiverChats', function ($query) {
-                    $query->where('receiver_id', auth()->user()->id)
-                        ->whereNotNull('message')
-                        ->orWhereNotNull('attachment');
-                });
-        })
-            ->where(function ($query) {
-                if ($this->search) {
-                    $query->where('name', 'like', '%' . $this->search . '%');
-                }
-            })
-            ->withCount(['unseenSenderChats' => function ($query) {
-                $query->where('is_seen', false);
-            }])
-            ->with(['senderChats' => function ($query) {
-                $query->whereNotNull('message')
-                    ->orWhereNotNull('attachment');
-            }, 'receiverChats' => function ($query) {
-                $query->whereNotNull('message')
-                    ->orWhereNotNull('attachment');
-            }])
-            ->get()
-            ->map(function ($user) {
-                $allChats = $user->receiverChats->concat($user->senderChats)
-                    ->filter(function ($chat) {
-                        return $chat->receiver_id === auth()->user()->id || $chat->sender_id === auth()->user()->id;
-                    })
-                    ->sortByDesc('created_at');
-                $latestChat = $allChats->first();
-                $user->latest_chat_created_at = $latestChat->created_at ?? null;
-                return $user;
-            });
-        $groupChats = GroupChat::with('groupChatMembers')
-            ->whereHas('groupChatMembers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->where(function ($query) {
-                $query->where('group_chat_name', 'like', '%' . $this->search . '%');
-            })
-            ->withCount(['groupChatContents as unseen_count' => function ($query) use ($user) {
-                $query->where('user_id', '!=', $user->id)
-                    ->whereDoesntHave('groupChatSeenBies', function ($subQuery) use ($user) {
-                        $subQuery->where('user_id', $user->id);
-                    });
-            }])
-            ->whereHas('groupChatContents')
-            ->get()
-            ->map(function ($groupChat) {
-                $latestChat = $groupChat->groupChatContents->sortByDesc('created_at')->first();
-                $groupChat->latest_chat_created_at = $latestChat->created_at ?? null;
-                return $groupChat;
-            });
-
-        $combined = $users->map(function ($user) {
-            $user->type = 'user';
-            return $user;
-        })->merge(
-            $groupChats->map(function ($groupChat) {
-                $groupChat->type = 'groupChat';
-                return $groupChat;
-            })
-        )->sortByDesc('latest_chat_created_at');
-
-        $convos = Chat::with(['sender', 'receiver'])
+        $convos = Chat::with(['sender', 'chatReactions.emoji', 'chatReactions.user'])
             ->where(function ($query) use ($userId) {
                 $query->where(function ($subQuery) use ($userId) {
                     $subQuery->where('sender_id', $this->userConvo->id)
@@ -186,10 +121,84 @@ class Conversation extends Component
 
         $lastUnseen = $convos->where('is_seen', false)->last();
 
-        $emojis = Emoji::orderBy('id', 'asc')
-            ->get();
+        return compact('convos', 'lastUnseen');
+    }
 
-        return compact('convos', 'lastUnseen',  'combined', 'emojis');
+    public function userList()
+    {
+        $user = auth()->user();
+
+        $userId = $user->id;
+
+        $users = User::where(function ($query) use ($userId) {
+            $query->whereHas('senderChats', function ($query) use ($userId) {
+                $query->where('sender_id', $userId)
+                    ->whereNotNull('message')
+                    ->orWhereNotNull('attachment');
+            })
+                ->orWhereHas('receiverChats', function ($query) use ($userId) {
+                    $query->where('receiver_id', $userId)
+                        ->whereNotNull('message')
+                        ->orWhereNotNull('attachment');
+                });
+        })
+            ->where(function ($query) {
+                if ($this->search) {
+                    $query->where('name', 'like', '%' . $this->search . '%');
+                }
+            })
+            ->withCount(['unseenSenderChats' => function ($query) {
+                $query->where('is_seen', false);
+            }])
+            ->with(['senderChats' => function ($query) {
+                $query->whereNotNull('message')
+                    ->orWhereNotNull('attachment');
+            }, 'receiverChats' => function ($query) {
+                $query->whereNotNull('message')
+                    ->orWhereNotNull('attachment');
+            }])
+            ->get()
+            ->map(function ($user) use ($userId) {
+                $allChats = $user->receiverChats->concat($user->senderChats)
+                    ->filter(function ($chat) use ($userId) {
+                        return $chat->receiver_id === $userId || $chat->sender_id === $userId;
+                    })
+                    ->sortByDesc('created_at');
+                $latestChat = $allChats->first();
+                $user->latest_chat_created_at = $latestChat->created_at ?? null;
+                return $user;
+            });
+        $groupChats = GroupChat::whereHas('groupChatMembers', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+            ->where(function ($query) {
+                $query->where('group_chat_name', 'like', '%' . $this->search . '%');
+            })
+            ->withCount(['groupChatContents as unseen_count' => function ($query) use ($user) {
+                $query->where('user_id', '!=', $user->id)
+                    ->whereDoesntHave('groupChatSeenBies', function ($subQuery) use ($user) {
+                        $subQuery->where('user_id', $user->id);
+                    });
+            }])
+            ->whereHas('groupChatContents')
+            ->get()
+            ->map(function ($groupChat) {
+                $latestChat = $groupChat->groupChatContents->sortByDesc('created_at')->first();
+                $groupChat->latest_chat_created_at = $latestChat->created_at ?? null;
+                return $groupChat;
+            });
+
+        $combined = $users->map(function ($user) {
+            $user->type = 'user';
+            return $user;
+        })->merge(
+            $groupChats->map(function ($groupChat) {
+                $groupChat->type = 'groupChat';
+                return $groupChat;
+            })
+        )->sortByDesc('latest_chat_created_at');
+
+        return compact('combined');
     }
 
     protected function escapeAndConvertUrlsToLinks($text)
@@ -204,12 +213,8 @@ class Conversation extends Component
 
     public function mount($userToken)
     {
-        $convo = User::where('user_token', $userToken)
-
-            ->withCount(['unseenSenderChats' => function ($query) {
-                $query->where('is_seen', false);
-            }])
-
+        $convo = User::with(['senderChats', 'receiverChats'])
+            ->where('user_token', $userToken)
             ->first();
 
         $this->previous = URL::previous();
@@ -219,11 +224,19 @@ class Conversation extends Component
         } else {
             $this->userConvo = $convo;
         }
+
+        $this->emojis = Emoji::orderBy('id', 'asc')
+            ->get();
+
+        $this->emojiReaction = Emoji::whereIn('id', [7, 8, 14, 51, 52, 155, 1042])
+            ->get();
     }
 
     #[On(['submitEnter'])]
     public function sendMessage()
     {
+        $user = auth()->user();
+
         if (empty($this->attachment)) {
 
             $this->validate();
@@ -243,14 +256,14 @@ class Conversation extends Component
             $attachmentPaths[] = $attach->storeAs(path: 'public/attachments', name: $fileName);
         }
 
-        auth()->user()->update(['status' => 'online']);
+        $user->update(['status' => 'online']);
 
         $chat = Chat::create([
-            'sender_id'         =>              auth()->user()->id,
+            'sender_id'         =>              $user->id,
             'receiver_id'       =>              $receiverId,
             'attachment'        =>              $attachmentPaths,
             'message'           =>              $this->message,
-            'is_seen'           =>              $receiverDetails->user_token === auth()->user()->user_token ? true : false,
+            'is_seen'           =>              $receiverDetails->user_token === $user->user_token ? true : false,
         ]);
 
         event(new MessageSent($chat));
@@ -264,23 +277,26 @@ class Conversation extends Component
 
     public function sendLike()
     {
+        $user = auth()->user();
 
         $receiverId = $this->userConvo->id;
         $receiverDetails = $this->userConvo;
 
         $attachmentPaths = [];
 
-        auth()->user()->update(['status' => 'online']);
+        $user->update(['status' => 'online']);
 
         $chat = Chat::create([
-            'sender_id'         =>              auth()->user()->id,
+            'sender_id'         =>              $user->id,
             'receiver_id'       =>              $receiverId,
             'attachment'        =>              $attachmentPaths,
             'message'           =>              '(y)',
-            'is_seen'           =>              $receiverDetails->user_token === auth()->user()->user_token ? true : false,
+            'is_seen'           =>              $receiverDetails->user_token === $user->user_token ? true : false,
         ]);
 
         event(new MessageSent($chat));
+
+        $this->dispatch('scrollBot');
     }
 
 
@@ -338,8 +354,9 @@ class Conversation extends Component
     // #[On(['submitEnter'])]
     public function seen($userId)
     {
+        $userReceiverId = auth()->user()->id;
         $isSeen = Chat::where('sender_id', $userId)
-            ->where('receiver_id', auth()->user()->id)
+            ->where('receiver_id', $userReceiverId)
             ->where('is_seen', false)
             ->update([
                 'is_seen'       =>      true
@@ -402,6 +419,8 @@ class Conversation extends Component
     public function update()
     {
 
+        $userId = auth()->user()->id;
+
         if (!$this->toEdit) {
             $this->dispatch('toastr', [
                 'type'          =>          'error',
@@ -409,7 +428,7 @@ class Conversation extends Component
             ]);
 
             return;
-        } elseif ($this->toEdit->sender_id != auth()->user()->id) {
+        } elseif ($this->toEdit->sender_id != $userId) {
             $this->dispatch('toastr', [
                 'type'          =>          'error',
                 'message'       =>          'You cannot update users message',
@@ -456,8 +475,36 @@ class Conversation extends Component
         $this->activeImageIndex = $index;
     }
 
+    public function handleEmojiClick($emojiId, $convoId)
+    {
+        $user = auth()->user();
+
+        $reaction = ChatReaction::where('user_id', $user->id)
+            ->where('emoji_id', $emojiId)
+            ->where('chat_id', $convoId)
+            ->first();
+
+        if($reaction)
+        {
+            $reaction->delete();
+
+            $this->dispatch('closeModal', ['convoId' => $convoId]);
+
+        } else {
+            ChatReaction::updateOrCreate([
+                'user_id'           =>              $user->id,
+                'emoji_id'          =>              $emojiId,
+                'chat_id'           =>              $convoId
+            ]);
+        }
+    }
+
     public function render()
     {
-        return view('livewire.chats.conversation', $this->conversation());
+        return view(
+            'livewire.chats.conversation',
+            $this->conversation(),
+            $this->userList(),
+        );
     }
 }

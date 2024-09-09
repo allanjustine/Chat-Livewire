@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Announcement as AnnouncementModel;
+use App\Models\Comment;
 use App\Models\Like;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
@@ -23,12 +24,15 @@ class Announcement extends Component
     public $isEditing = false;
     public $announcementToEdit;
     public $post_attachment_to_edit = [];
+    public $allPost;
+    public $comment_content;
 
     use WithFileUploads;
 
     public function index()
     {
-        $announcements = AnnouncementModel::take($this->load)
+        $announcements = AnnouncementModel::with(['likes.user', 'user', 'comments.user'])
+            ->take($this->load)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -44,6 +48,8 @@ class Announcement extends Component
             ->take(10)
             ->get();
 
+        $this->allPost = AnnouncementModel::count();
+
         return compact('announcements', 'updates', 'post_trends');
     }
 
@@ -57,7 +63,7 @@ class Announcement extends Component
         $this->validate([
             'post_title'            =>              ['required', 'min:1', 'max:30'],
             'post_content'          =>              ['required', 'min:1'],
-            'post_attachment.*'     =>              ['max:102400', 'nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar,txt,html,css,php,js,ts,py,java,c,cpp,rb,go,swift,rs,scala,pl,r']
+            'post_attachment.*'     =>              ['max:5120', 'nullable', 'mimes:jpg,jpeg,png,gif,ico,webp,pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar,txt,html,css,php,js,ts,py,java,c,cpp,rb,go,swift,rs,scala,pl,r']
         ]);
 
         $attachmentPaths = [];
@@ -76,6 +82,8 @@ class Announcement extends Component
             'post_category'         =>              $this->post_category ?: 'post',
             'post_attachment'       =>              $attachmentPaths
         ]);
+
+        $this->post_attachment = null;
 
         $this->reset([
             'post_attachment',
@@ -172,7 +180,7 @@ class Announcement extends Component
         $this->validate([
             'post_title'            =>              ['required', 'min:1', 'max:20'],
             'post_content'          =>              ['required', 'min:1'],
-            'post_attachment.*'     =>              ['max:102400', 'nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar,txt,html,css,php,js,ts,py,java,c,cpp,rb,go,swift,rs,scala,pl,r']
+            'post_attachment.*'     =>              ['max:5120', 'nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar,txt,html,css,php,js,ts,py,java,c,cpp,rb,go,swift,rs,scala,pl,r']
         ]);
 
         if (!$this->announcementToEdit) {
@@ -266,6 +274,46 @@ class Announcement extends Component
         $this->post_title = '';
         $this->post_content = '';
         $this->dispatch('setPostContent', $this->post_content);
+    }
+
+    public function postComment($postId)
+    {
+        $user = auth()->user();
+
+        $post = AnnouncementModel::find($postId);
+
+        $this->validate([
+            'comment_content'       =>              ['required', 'min:1', 'max:255']
+        ]);
+
+        if (!$post) {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Failed to comment no post found',
+            ]);
+        } else {
+            Comment::create([
+                'user_id'                   =>                 $user->id,
+                'announcement_id'           =>                 $postId,
+                'comment_content'           =>                 $this->comment_content
+            ]);
+
+            $this->reset('comment_content');
+        }
+    }
+
+    public function deleteComment($commentId)
+    {
+        $comment = Comment::find($commentId);
+
+        if (!$comment) {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Comment already deleted/not found',
+            ]);
+        } else {
+            $comment->delete();
+        }
     }
 
     public function render()

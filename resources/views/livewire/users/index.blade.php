@@ -1,6 +1,7 @@
 <div>
     <div class="container-fluid">
         <div class="mt-5">
+            <button class="float-end btn btn-primary" wire:click='setOfflineAll'>Set all offline</button>
             <h1 class="fw-bold text-white">
                 Users
             </h1>
@@ -14,6 +15,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Status</th>
+                        <th>Role</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -32,6 +34,19 @@
                         <td><span
                                 class="{{ $user->email_verified_at ? 'badge rounded-pill text-bg-primary' : 'badge rounded-pill text-bg-danger' }}">
                                 {{ $user->email_verified_at ? 'Verified' : 'Not Verified' }}</span></td>
+                        <td>@forelse ($user->roles as $role )
+                            <span class="badge badge-pill {{ $role->name === 'admin' ? 'bg-info' : 'bg-dark' }}">
+                                {{ $role->name }}
+                            </span>
+                            @empty
+                            <button class="btn btn-primary btn-sm" wire:click='assignRole({{ $user->id }})'>
+                                Add role
+                            </button>
+                            <span class="badge badge-pill bg-danger">
+                                No roles applied
+                            </span>
+                            @endforelse
+                        </td>
                         <td>
                             <div class="d-flex gap-1">
                                 @if ($user->email_verified_at === null)
@@ -48,7 +63,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center">
+                        <td colspan="7" class="text-center">
                             No users found.
                         </td>
                     </tr>

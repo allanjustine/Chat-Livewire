@@ -18,7 +18,7 @@ class GroupChat extends Model
     public function groupChatMembers()
     {
         return $this->belongsToMany(User::class, 'group_chat_members')
-        ->withPivot(['gc_nickname', 'id'])
+        ->withPivot(['gc_nickname', 'id', 'is_admin'])
         ->withTimestamps();
     }
 

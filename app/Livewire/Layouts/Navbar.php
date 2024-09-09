@@ -27,7 +27,7 @@ class Navbar extends Component
     {
         $user = auth()->user();
         if (auth()->check()) {
-            $user->status = 'offline';
+            $user->update(['status' => 'offline']);
             auth()->logout();
         }
 

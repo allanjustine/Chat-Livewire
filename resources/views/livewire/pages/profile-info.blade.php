@@ -29,70 +29,64 @@
         </ul>
 
         <div class="text-white intro-section bg-dark">
-            <h4>Intro</h4>
-            <div class="d-flex gap-5">
-                <div>
-                    <ul class="list-unstyled">
-                        <li class="d-flex align-items-center mb-2">
-                            <div class="me-2" style="width: 20px;">
-                                <i class="far fa-calendar"></i>
-                            </div>
-                            <div>{{ \Carbon\Carbon::parse($profileData->date_of_birth)->format('F d, Y') }}</div>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <div class="me-2" style="width: 20px;">
-                                <i class="far fa-location-dot"></i>
-                            </div>
-                            <div>{{ $profileData->address }}</div>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <div class="me-2" style="width: 20px;">
-                                <i class="far fa-input-numeric"></i>
-                            </div>
-                            <div>{{ $profileData->age }}</div>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <div class="me-2" style="width: 20px;">
-                                <i class="far fa-phone"></i>
-                            </div>
-                            <div>{{ $profileData->phone_number }}</div>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <ul class="list-unstyled">
-                        <li class="d-flex align-items-center mb-2">
-                            <div class="me-2" style="width: 20px;">
-                                @if ($profileData->gender === 'Male')
-                                <i class="far fa-mars"></i>
-                                @elseif($profileData->gender === 'Female')
-                                <i class="far fa-venus"></i>
-                                @else
-                                <i class="fa-thin fa-mars-and-venus-burst"></i>
-                                @endif
-                            </div>
-                            <div>{{ $profileData->gender }}</div>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <div class="me-2" style="width: 20px;">
-                                <i class="far fa-book-user"></i>
-                            </div>
-                            <div class="text-break">{{ $profileData->bio ?: 'No bio' }}</div>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <div class="me-2" style="width: 20px;">
-                                <i class="far fa-envelope"></i>
-                            </div>
-                            <div>{{ $profileData->email }}</div>
-                        </li>
-                        <li class="d-flex align-items-center mb-2">
-                            <div class="me-2" style="width: 20px;">
-                                <i class="far fa-user"></i>
-                            </div>
-                            <div>{{ $profileData->username }}</div>
-                        </li>
-                    </ul>
-                </div>
+            <h4 class="border-bottom pb-2">Details</h4>
+            <div>
+                <ul class="list-unstyled">
+                    <li class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="width: 20px;">
+                            <i class="far fa-calendar"></i>
+                        </div>
+                        <div>{{ \Carbon\Carbon::parse($profileData->date_of_birth)->format('F d, Y') }}</div>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="width: 20px;">
+                            <i class="far fa-location-dot"></i>
+                        </div>
+                        <div>{{ $profileData->address }}</div>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="width: 20px;">
+                            <i class="far fa-input-numeric"></i>
+                        </div>
+                        <div>{{ $profileData->age }}</div>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="width: 20px;">
+                            <i class="far fa-phone"></i>
+                        </div>
+                        <div>{{ $profileData->phone_number }}</div>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="width: 20px;">
+                            @if ($profileData->gender === 'Male')
+                            <i class="far fa-mars"></i>
+                            @elseif($profileData->gender === 'Female')
+                            <i class="far fa-venus"></i>
+                            @else
+                            <i class="fa-thin fa-mars-and-venus-burst"></i>
+                            @endif
+                        </div>
+                        <div>{{ $profileData->gender }}</div>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="width: 20px;">
+                            <i class="far fa-book-user"></i>
+                        </div>
+                        <div class="text-break">{{ $profileData->bio ?: 'No bio' }}</div>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="width: 20px;">
+                            <i class="far fa-envelope"></i>
+                        </div>
+                        <div>{{ $profileData->email }}</div>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="width: 20px;">
+                            <i class="far fa-user"></i>
+                        </div>
+                        <div>{{ $profileData->username }}</div>
+                    </li>
+                </ul>
             </div>
             @if (auth()->user()->id === $profileData->id)
             <a class="btn btn-primary" href="/profile" wire:navigate><i class="far fa-pen"></i> Edit details</a>

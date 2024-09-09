@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages;
 
 use App\Models\Announcement;
+use App\Models\Comment;
 use App\Models\Like;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -12,14 +13,15 @@ use Livewire\Component;
 class AnnouncementSingle extends Component
 {
 
-    #[Title('Profile')]
+    #[Title('Announcement')]
 
     public $previous;
     public $updatesData;
+    public $comment_content;
 
     public function mount($postTitle)
     {
-        $updates = Announcement::where('post_title', $postTitle)->first();
+        $updates = Announcement::with(['likes.user', 'user', 'comments'])->where('post_title', $postTitle)->first();
 
         $this->previous = URL::previous();
 
@@ -118,6 +120,52 @@ class AnnouncementSingle extends Component
             $toDelete->delete();
 
             return $this->redirect('/announcement', navigate: true);
+        }
+    }
+
+    public function postComment($postId)
+    {
+        $user = auth()->user();
+
+        $post = Announcement::find($postId);
+
+        $this->validate([
+            'comment_content'       =>              ['required', 'min:1', 'max:255']
+        ]);
+
+        $this->validate([
+            'comment_content'       =>              ['required', 'min:1', 'max:255']
+        ]);
+
+        if(!$post)
+        {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Failed to comment no post found',
+            ]);
+        } else {
+            Comment::create([
+                'user_id'                   =>                 $user->id,
+                'announcement_id'           =>                 $postId,
+                'comment_content'           =>                 $this->comment_content
+            ]);
+
+            $this->reset('comment_content');
+        }
+    }
+
+    public function deleteComment($commentId)
+    {
+        $comment = Comment::find($commentId);
+
+        if(!$comment)
+        {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Comment already deleted/not found',
+            ]);
+        } else {
+            $comment->delete();
         }
     }
 

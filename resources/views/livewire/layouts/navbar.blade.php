@@ -49,11 +49,22 @@
 
                         </a>
                     </li>
+                    @role('admin')
+                    <li class="nav-iteme">
+                        <a class="nav-link {{ 'admin/users' === request()->path() ? 'active' : '' }}" href="/admin/users"
+                            wire:navigate>
+                            <i class="far fa-users">
+
+                            </i> Users
+
+                        </a>
+                    </li>
+                    @endrole
 
                 </ul>
                 <div class="navbar-nav">
                     <div class="dropdown">
-                        <a class="nav-link mt-1" href="#" id="navbarDropdownMenuLink" role="button"
+                        <a class="nav-link d-flex gap-2 mt-1" href="#" id="navbarDropdownMenuLink" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             <span class="position-relative"><i class="far fa-bell fs-5"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge
@@ -61,6 +72,7 @@
                                     1
                                 </span>
                             </span>
+                            <span class="d-md-none d-block">Notifications</span>
                         </a>
                         <div class="dropdown-menu shadow dropdown-menu-end p-2" style="min-width: 300px; z-index: 1021 !important;"
                             aria-labelledby="navbarDropdownMenuLink">
@@ -93,7 +105,7 @@
                         </div>
                     </div>
                     <div class="dropdown">
-                        <a class="nav-link" href="/profile-info/{{ auth()->user()->username }}" id="navbarDropdownMenuLink" role="button"
+                        <a class="nav-link d-flex gap-2" href="/profile-info/{{ auth()->user()->username }}" id="navbarDropdownMenuLink" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             <img @if (auth()->user()->profile_picture === null)
                             src="/images/profile.png"
@@ -102,6 +114,8 @@
                             @endif
                             alt="{{ auth()->user()->name }}" width="30" height="30"
                             class="rounded-circle">
+
+                            <span class="d-md-none d-block mt-2">{{ auth()->user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu shadow dropdown-menu-end" style="min-width: 300px;"
                             aria-labelledby="navbarDropdownMenuLink">
