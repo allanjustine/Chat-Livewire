@@ -15,7 +15,6 @@ class AnnouncementSingle extends Component
 
     #[Title('Announcement')]
 
-    public $previous;
     public $updatesData;
     public $comment_content;
 
@@ -23,10 +22,9 @@ class AnnouncementSingle extends Component
     {
         $updates = Announcement::with(['likes.user', 'user', 'comments'])->where('post_title', $postTitle)->first();
 
-        $this->previous = URL::previous();
-
         if (!$updates) {
-            $this->redirect($this->previous, navigate: true);
+
+            $this->redirect('/updates/post-not-found-or-deleted/404', navigate: true);
         }
         $this->updatesData = $updates;
     }

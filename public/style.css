@@ -10,12 +10,13 @@
     /* font-family: "Montserrat", sans-serif; */
 }
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 12px;
 }
 
 ::-webkit-scrollbar-thumb {
     background-color: #1d1d1d;
     border-radius: 10px;
+    cursor: pointer;
 }
 
 ::-webkit-scrollbar-track {

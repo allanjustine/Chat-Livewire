@@ -1,5 +1,5 @@
 <div>
-    <div class="container-fluid mt-4">
+    <div class="container-fluid mt-4" wire:poll.10s>
         <strong>
             <h2 class="ms-5 text-white">Announcements</h2>
         </strong>
@@ -26,7 +26,7 @@
                                     <label for="post_title" class="form-label">Title</label>
                                     <input type="text" id="post_title" class="form-control" wire:model="post_title"
                                         placeholder="Enter a post title">
-                                    @error('post_title') <span class="text-danger">{{ $message }}</span> @enderror
+                                    @error('post_title') <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div class="mb-2 col-6">
@@ -39,7 +39,7 @@
                                         <option value="branch">For Branch</option>
                                         <option value="ho">For Head Office</option>
                                     </select>
-                                    @error('post_category') <span class="text-danger">{{ $message }}</span> @enderror
+                                    @error('post_category') <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
@@ -48,7 +48,7 @@
                                 <input type="file" id="post_attachment" multiple class="form-control"
                                     accept=".jpg,.jpeg,.png,.gif,.ico,.webp,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.txt,.html,.css,.php,.js,.ts,.py,.java,.c,.cpp,.rb,.go,.swift,.rs,.scala,.pl,.r"
                                     wire:model="post_attachment">
-                                @error('post_attachment.*') <span class="text-danger">{{ $message }}</span> @enderror
+                                @error('post_attachment.*') <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span> @enderror
 
                                 <span class="text-light mt-2" wire:loading wire:target="post_attachment">
                                     <i class="fa-duotone fa-solid fa-spinner-third fa-spin"></i>
@@ -61,7 +61,7 @@
                                 <div id="editor-container"></div>
                             </div>
                             @error('post_content')
-                            <span class="text-danger">{{ $message }}</span>
+                            <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="modal-footer">
@@ -82,17 +82,15 @@
                 </div>
             </div>
         </div>
-
-
         <hr>
         <div class="row mt-3">
-            <div class="col-md-3 mb-4">
-                <div class="bg-primary-subtle sticky-top p-3 rounded shadow-sm">
+            <div class="col-md-3 col-lg-4 mb-4">
+                <div class="bg-primary-subtle sticky-top p-3 rounded shadow-sm" style="z-index: 1;">
                     <h5 class="mb-3 fw-bold"><i class="fas text-secondary fa-cloud"></i> Updates</h5>
                     <ul class="list-unstyled">
                         @forelse ($updates as $update)
                         <li class="mb-2"><a href="/updates/{{ $update->post_title }}" wire:navigate
-                                class="text-dark"><strong><span class="fs-6">{{ Str::limit($update->post_title, 15)
+                                class="text-dark"><strong><span class="fs-6">{{ Str::limit($update->post_title, 30)
                                         }}</span></strong></a> - <span class="text-muted fst-italic"
                                 style="font-size: 10px;">{{ $update->created_at->diffForHumans() }}</span></li>
                         @empty
@@ -103,7 +101,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 col-lg-4">
                 @forelse ($announcements as $announcement)
                 <div class="mb-4 bg-dark text-light p-4 rounded shadow-sm position-relative">
                     <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px;">Posted on {{
@@ -143,9 +141,9 @@
                         </div>
                     </div>
                     <hr>
-                    <div class="mt-3">
+                    {{-- <div class="mt-3">
                         <h2 class="mb-3">{{ $announcement->post_title }}</h2>
-                    </div>
+                    </div> --}}
                     <div>
                         <ul class="list-unstyled">
                             @foreach ($announcement->post_attachment as $file)
@@ -190,10 +188,15 @@
                                 aria-current="true" aria-label="Slide {{ $index + 1 }}"></button>
                             @endforeach
                         </div>
+                        <div wire:ignore id="image-overlay" class="image-overlay">
+                            <span class="close">&times;</span>
+                            <img id="overlay-image" class="overlay-image">
+                        </div>
                         <div class="carousel-inner">
                             @foreach ($images as $index => $image)
                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ Storage::url($image) }}" class="d-block w-100" alt="..." style="max-height: 400px;">
+                                <img src="{{ Storage::url($image) }}" class="d-block w-100 carousel-image" alt="..."
+                                    style="max-height: 400px; cursor: pointer;">
                             </div>
                             @endforeach
                         </div>
@@ -352,17 +355,17 @@
                                         </button>
                                     </div>
                                     @error('comment_content')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
                                     @enderror
                                 </div>
                             </div>
                         </div>
                     </div>
                     <hr>
-                    <div class="mt-3">
+                    <div class="mt-3 rounded" style="background-color: #6060603c;">
                         @if ($lastComment = $announcement->comments->last())
                         <div class="mb-2">
-                            <div style="position: absolute;" class="mt-1">
+                            <div style="position: absolute;" class="mt-1 ms-2">
                                 <a href="/profile-info/{{ $lastComment->user->username }}" wire:navigate>
                                     <img @if ($lastComment->user->profile_picture === null)
                                     src="/images/profile.png"
@@ -455,9 +458,9 @@
                                         </div>
                                     </div>
                                     <hr>
-                                    <div class="mt-3">
+                                    {{-- <div class="mt-3">
                                         <h2 class="mb-3">{{ $announcement->post_title }}</h2>
-                                    </div>
+                                    </div> --}}
                                     <div>
                                         <ul class="list-unstyled">
                                             @foreach ($announcement->post_attachment as $file)
@@ -507,7 +510,8 @@
                                         <div class="carousel-inner">
                                             @foreach ($images as $index => $image)
                                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                                <img src="{{ Storage::url($image) }}" class="d-block w-100" alt="..." style="max-height: 400px;">
+                                                <img src="{{ Storage::url($image) }}" class="d-block w-100" alt="..."
+                                                    style="max-height: 600px;">
                                             </div>
                                             @endforeach
                                         </div>
@@ -645,13 +649,13 @@
                                                     </button>
                                                 </div>
                                                 @error('comment_content')
-                                                <span class="text-danger">{{ $message }}</span>
+                                                <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="px-4 mt-3">
+                                <div class="px-4 mt-3 rounded mx-2" style="background-color: #2a2a2a58;">
                                     @foreach ($announcement->comments->sortByDesc('created_at') as $comment)
                                     <div class="mb-2">
                                         <div style="position: absolute;" class="mt-1">
@@ -669,8 +673,7 @@
                                         <div class="ms-5">
                                             <footer class="px-4 py-2 text-white mb-2 mt-3 footer-comment">
                                                 <a class="text-light"
-                                                    href="/profile-info/{{ $comment->user->username }}"
-                                                    wire:navigate>
+                                                    href="/profile-info/{{ $comment->user->username }}" wire:navigate>
                                                     <strong>{{ $comment->user->name }}</strong>
                                                 </a>
                                                 <br>
@@ -722,14 +725,14 @@
             </div>
 
             <!-- Right Sidebar: Post Trends -->
-            <div class="col-md-3 mb-4">
+            <div class="col-md-3 col-lg-4 mb-4">
                 <div class="bg-info-subtle sticky-top p-3 rounded shadow-sm" style="z-index: 1;">
                     <h5 class="mb-3 fw-bold"><i class="fas fa-fire text-danger"></i> Post Trends</h5>
                     <ul class="list-unstyled">
                         @forelse ($post_trends as $trend)
                         <li class="mb-2"><a href="/updates/{{ $trend->post_title }}" wire:navigate
                                 class="text-dark"><strong><span class="fs-6">{{ Str::limit($trend->post_title,
-                                        20)
+                                        30)
                                         }}</span></strong></a> - <span class="text-muted fst-italic">{{
                                 $trend->likes_count }} {{ $trend->likes_count > 1 ?
                                 'likes' : 'like' }}</span></li>
@@ -823,6 +826,47 @@
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
+        }
+
+        .ql-editor {
+            min-height: 100px;
+        }
+
+        .image-overlay {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .overlay-image {
+            max-width: 60%;
+            max-height: 70%;
+            transition: transform 0.25s ease;
+        }
+
+        .image-overlay.zoomed .overlay-image {
+            transform: scale(1.3);
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #bbb;
         }
     </style>
 
@@ -938,6 +982,36 @@
 
         toastr.success('Link copied to clipboard!', 'Success');
     }
+    </script>
+
+    <script>
+        document.addEventListener('livewire:navigated', () => {
+            const overlay = document.getElementById('image-overlay');
+            const overlayImage = document.getElementById('overlay-image');
+            const closeButton = document.querySelector('.close');
+            const carouselImages = document.querySelectorAll('.carousel-image');
+
+            carouselImages.forEach(image => {
+                image.addEventListener('click', () => {
+                    overlayImage.src = image.src;
+                    overlay.style.display = 'flex';
+                    setTimeout(() => overlay.classList.add('zoomed'), 10);
+                });
+            });
+
+            closeButton.addEventListener('click', () => {
+                overlay.classList.remove('zoomed');
+                setTimeout(() => overlay.style.display = 'none', 250);
+            });
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('zoomed');
+                    setTimeout(() => overlay.style.display = 'none', 250);
+                }
+            });
+        });
+
     </script>
 
 </div>

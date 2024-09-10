@@ -80,6 +80,23 @@ class Navbar extends Component
         }
     }
 
+    public function markAsRead($notificationId)
+    {
+        $user = auth()->user();
+        $notification = $user->notifications->find($notificationId);
+
+        if ($notification) {
+            $notification->markAsRead();
+        }
+    }
+
+    public function markAllAsRead()
+    {
+        $user = auth()->user();
+
+        $user->unreadNotifications->markAsRead();
+    }
+
     public function render()
     {
         return view('livewire.layouts.navbar');

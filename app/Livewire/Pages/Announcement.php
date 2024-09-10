@@ -8,6 +8,8 @@ use Livewire\Component;
 use App\Models\Announcement as AnnouncementModel;
 use App\Models\Comment;
 use App\Models\Like;
+use App\Models\User;
+use App\Notifications\AnnouncementNotification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
@@ -75,7 +77,7 @@ class Announcement extends Component
             $attachmentPaths[] = $attach->storeAs(path: 'public/post/attachments', name: $fileName);
         }
 
-        AnnouncementModel::create([
+        $announcementCreated = AnnouncementModel::create([
             'user_id'               =>              auth()->user()->id,
             'post_title'            =>              $this->post_title,
             'post_content'          =>              $this->post_content,
@@ -98,6 +100,16 @@ class Announcement extends Component
             'type'          =>          'success',
             'message'       =>          'Your post is posted successfully',
         ]);
+
+        $users = User::where('id', '!=', auth()->user()->id)->get();
+
+        if($announcementCreated->post_category === 'updates')
+        {
+            foreach($users as $user)
+            {
+                $user->notify(new AnnouncementNotification($announcementCreated));
+            }
+        }
     }
 
     public function like($announcementId)
@@ -129,6 +141,7 @@ class Announcement extends Component
                     'user_id'                   =>          auth()->user()->id,
                     'announcement_id'           =>          $like->id
                 ]);
+
             }
         }
     }

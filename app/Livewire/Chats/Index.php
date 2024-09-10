@@ -26,7 +26,14 @@ class Index extends Component
     public $group_chat_name;
     public $member = [];
     public $search_member = '';
+    public $loadMore = 5;
+    public $load = 20;
+    public $usersCount = 0;
 
+    public function loadMorePage()
+    {
+        $this->load += $this->loadMore;
+    }
 
     #[On('echo:sendMessage,MessageSent')]
     #[On('echo:isSeen,IsSeen')]
@@ -48,13 +55,13 @@ class Index extends Component
             $latestChat = $allChats->first();
 
             return $latestChat->created_at ?? null;
-        });
+        })->take($this->load);
 
         $searched = User::where('name', 'like', '%' . $this->search . '%')
             ->get();
 
 
-        $totalChats = Chat::where('receiver_id', auth()->user()->id)
+        $totalChats = Chat::where('receiver_id', $user->id)
             ->where('is_seen', false)
             ->count();
 
@@ -93,6 +100,8 @@ class Index extends Component
                 $query->where('user_id', $user->id);
             })->orderBy('created_at', 'desc')
             ->get();
+
+        $this->usersCount = User::count();
 
         return compact(
             'users',

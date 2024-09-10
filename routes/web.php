@@ -7,6 +7,7 @@ use App\Livewire\Chats\Conversation;
 use App\Livewire\Chats\GroupConversation;
 use App\Livewire\Chats\Index;
 use App\Livewire\Pages\Announcement;
+use App\Livewire\Pages\AnnouncementDeleted;
 use App\Livewire\Pages\AnnouncementSingle;
 use App\Livewire\Pages\Home;
 use App\Livewire\Pages\Landing;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', Landing::class);
 Route::get('/login', Login::class);
 Route::get('/register', Register::class);
-Route::fallback(Login::class);
+// Route::fallback(Login::class);
 
 Route::group(['middleware' => ['auth', 'verified', 'role:user|admin']], function () {
     Route::get('/chats', Index::class);
@@ -29,6 +30,7 @@ Route::group(['middleware' => ['auth', 'verified', 'role:user|admin']], function
     Route::get('/gc/{groupChatToken}', GroupConversation::class);
     Route::get('/announcement', Announcement::class);
     Route::get('/updates/{postTitle}', AnnouncementSingle::class);
+    Route::get('/updates/post-not-found-or-deleted/404', AnnouncementDeleted::class);
 });
 
 Route::group(['middleware' => ['auth', 'verified', 'role:admin']], function () {

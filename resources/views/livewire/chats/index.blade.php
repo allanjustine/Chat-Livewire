@@ -82,6 +82,12 @@
                 @empty
                 <p class="text-center mt-5">No conversation.</p>
                 @endforelse
+                @if($users->count() < $usersCount)
+                <button class="btn btn-primary btn-sm m-1 float-end" wire:click='loadMorePage' wire:loading.attr='disabled'>
+                    <span wire:loading.remove wire:target='loadMorePage'>Load more</span>
+                    <span class="spinner-border" wire:loading wire:target='loadMorePage'></span>
+                </button>
+                @endif
                 @endif
                 @else
                 @if ($searched_gc)
@@ -132,7 +138,7 @@
 
             </ul>
         </div>
-        <div class="col-md-3 bg-light overflow-auto d-none d-md-block bg-dark" style="max-width: 250px;">
+        <div class="col-md-3 col-lg-3 bg-light overflow-auto d-none d-md-block bg-dark">
             <div class="py-3 px-2 sticky-top bg-dark text-white">
                 <h3>Chats</h3>
                 @if ($people === true)
@@ -208,6 +214,12 @@
                 @empty
                 <p class="text-center mt-5">No conversation.</p>
                 @endforelse
+                @if($users->count() < $usersCount)
+                <button class="btn btn-primary btn-sm m-1 float-end" wire:click='loadMorePage' wire:loading.attr='disabled'>
+                    <span wire:loading.remove wire:target='loadMorePage'>Load more</span>
+                    <span class="spinner-border" wire:loading wire:target='loadMorePage'></span>
+                </button>
+                @endif
                 @endif
                 @else
                 @if($searched_gc)
@@ -256,7 +268,7 @@
                 @endif
             </ul>
         </div>
-        <div class="col-md-9 col-sm-12 d-flex flex-column">
+        <div class="col-md-9 col-lg-9 col-sm-12 d-flex flex-column">
             <nav class="navbar navbar-secondary bg-secondary">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="#">
@@ -300,7 +312,7 @@
                                 <label class="form-label text-white" id="label-gcn" for="group_chat_name">Group Chat
                                     Name</label>
                                 @error('group_chat_name')
-                                <span class="text-danger">{{ $message }}</span>
+                                <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
                                 @enderror
                             </div>
                             <hr>
@@ -333,7 +345,7 @@
                                     @endforelse
                                 </div>
                                 @error('member')
-                                <span class="text-danger">{{ $message }}</span>
+                                <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>

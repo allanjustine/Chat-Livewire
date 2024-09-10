@@ -45,6 +45,7 @@ class GroupConversation extends Component
     public $emojiReaction = [];
     public $member = [];
     public $search_member = '';
+    public $addedMember = '';
 
 
     use WithFileUploads;
@@ -197,7 +198,7 @@ class GroupConversation extends Component
         $escapedText = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 
         $urlPattern = '@(https?://[^\s<>"\'()]+\.[^\s<>"\'()]+)@i';
-        $convertedText = preg_replace($urlPattern, '<a href="$1" target="_blank" style="color: #095ad2;" title="$1"><strong>$1</strong></a>', $escapedText);
+        $convertedText = preg_replace($urlPattern, '<a href="$1" target="_blank" style="color: #095ad2; background-color: #000000c7; border-radius: 5px; padding: 2px 5px 2px 5px;" title="$1"><strong>$1</strong></a>', $escapedText);
 
         return $convertedText;
     }
@@ -535,6 +536,7 @@ class GroupConversation extends Component
         ]);
 
         event(new AddMemberToGroupChat($this->member));
+
 
         $this->reset(['member', 'search_member']);
 

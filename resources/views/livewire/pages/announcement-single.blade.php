@@ -1,5 +1,5 @@
 <div>
-    <div class="container d-flex justify-content-center">
+    <div class="container d-flex justify-content-center" wire:poll.10s>
         <div class="col-md-6 col-12 mt-5">
             <div class="bg-dark text-light p-4 rounded shadow-sm position-relative">
                 <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px;">Posted on {{
@@ -39,9 +39,9 @@
                     </div>
                 </div>
                 <hr>
-                <div class="mt-3">
+                {{-- <div class="mt-3">
                     <h2 class="mb-3">{{ $updatesData->post_title }}</h2>
-                </div>
+                </div> --}}
                 <div>
                     <ul class="list-unstyled">
                         @foreach ($updatesData->post_attachment as $file)
@@ -86,10 +86,14 @@
                             aria-current="true" aria-label="Slide {{ $index + 1 }}"></button>
                         @endforeach
                     </div>
+                    <div wire:ignore id="image-overlay" class="image-overlay">
+                        <span class="close">&times;</span>
+                        <img id="overlay-image" class="overlay-image">
+                    </div>
                     <div class="carousel-inner">
                         @foreach ($images as $index => $image)
                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                            <img src="{{ Storage::url($image) }}" class="d-block w-100" alt="..." style="max-height: 400px;">
+                            <img src="{{ Storage::url($image) }}" class="d-block w-100 carousel-image" alt="..." style="max-height: 400px; cursor: pointer;">
                         </div>
                         @endforeach
                     </div>
@@ -239,16 +243,16 @@
                                     </button>
                                 </div>
                                 @error('comment_content')
-                                <span class="text-danger">{{ $message }}</span>
+                                <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="mt-3">
+                <div class="mt-3 rounded" style="background-color: #6060603c;">
                     @foreach ($updatesData->comments->sortByDesc('created_at') as $comment)
                     <div class="mb-2">
-                        <div style="position: absolute;" class="mt-1">
+                        <div style="position: absolute;" class="mt-1 ms-2">
                             <a href="/profile-info/{{ $comment->user->username }}">
                                 <img @if ($comment->user->profile_picture === null)
                                 src="/images/profile.png"
@@ -296,7 +300,7 @@
 
     <div wire:ignore.self class="modal fade" id="commentPost{{ $updatesData->id }}" tabindex="-1"
         aria-labelledby="commentPost{{ $updatesData->id }}Label" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
             <div class="modal-content bg-secondary">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5 text-light" id="commentPost{{ $updatesData->id }}Label">{{
@@ -342,9 +346,9 @@
                             </div>
                         </div>
                         <hr>
-                        <div class="mt-3">
+                        {{-- <div class="mt-3">
                             <h2 class="mb-3">{{ $updatesData->post_title }}</h2>
-                        </div>
+                        </div> --}}
                         <div>
                             <ul class="list-unstyled">
                                 @foreach ($updatesData->post_attachment as $file)
@@ -394,7 +398,7 @@
                             <div class="carousel-inner">
                                 @foreach ($images as $index => $image)
                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                    <img src="{{ Storage::url($image) }}" class="d-block w-100" alt="..." style="max-height: 400px;">
+                                    <img src="{{ Storage::url($image) }}" class="d-block w-100" alt="..." style="max-height: 600px;">
                                 </div>
                                 @endforeach
                             </div>
@@ -526,13 +530,13 @@
                                         </button>
                                     </div>
                                     @error('comment_content')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
                                     @enderror
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="px-4 mt-3">
+                    <div class="px-4 mt-3 mx-2 rounded" style="background-color: #2a2a2a58;">
                         @foreach ($updatesData->comments->sortByDesc('created_at') as $comment)
                         <div class="mb-2">
                             <div style="position: absolute;" class="mt-1">
@@ -641,6 +645,43 @@
             outline: none !important;
             box-shadow: none !important;
         }
+
+        .image-overlay {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .overlay-image {
+            max-width: 60%;
+            max-height: 70%;
+            transition: transform 0.25s ease;
+        }
+
+        .image-overlay.zoomed .overlay-image {
+            transform: scale(1.3);
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #bbb;
+        }
     </style>
 
     <script>
@@ -676,5 +717,35 @@
 
         toastr.success('Link copied to clipboard!', 'Success');
     }
+    </script>
+
+    <script>
+        document.addEventListener('livewire:navigated', () => {
+            const overlay = document.getElementById('image-overlay');
+            const overlayImage = document.getElementById('overlay-image');
+            const closeButton = document.querySelector('.close');
+            const carouselImages = document.querySelectorAll('.carousel-image');
+
+            carouselImages.forEach(image => {
+                image.addEventListener('click', () => {
+                    overlayImage.src = image.src;
+                    overlay.style.display = 'flex';
+                    setTimeout(() => overlay.classList.add('zoomed'), 10);
+                });
+            });
+
+            closeButton.addEventListener('click', () => {
+                overlay.classList.remove('zoomed');
+                setTimeout(() => overlay.style.display = 'none', 250);
+            });
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('zoomed');
+                    setTimeout(() => overlay.style.display = 'none', 250);
+                }
+            });
+        });
+
     </script>
 </div>

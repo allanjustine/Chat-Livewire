@@ -66,41 +66,55 @@
                     <div class="dropdown">
                         <a class="nav-link d-flex gap-2 mt-1" href="#" id="navbarDropdownMenuLink" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="position-relative"><i class="far fa-bell fs-5"></i>
+                            <span class="position-relative"><i class="{{ auth()->user()->unreadNotifications()->count() > 0 ? 'fas' : 'far' }} fa-bell fs-5"></i>
+                                @if (auth()->user()->unreadNotifications()->count() > 0)
                                 <span class="position-absolute top-0 start-100 translate-middle badge
                                     rounded-pill bg-danger" style="font-size: 8px;">
-                                    1
+                                    {{ auth()->user()->unreadNotifications()->count() }}
                                 </span>
+                                @endif
                             </span>
-                            <span class="d-md-none d-block">Notifications</span>
+                            <span class="d-md-none d-block sticky-top">Notifications</span>
                         </a>
-                        <div class="dropdown-menu shadow dropdown-menu-end p-2" style="min-width: 300px; z-index: 1021 !important;"
+                        <div class="dropdown-menu shadow dropdown-menu-end p-2" style="min-width: 350px; z-index: 1021 !important;"
                             aria-labelledby="navbarDropdownMenuLink">
                             <h6 class="mt-2 ms-2">Notifications</h6>
                             <hr>
-                            <div class="mt-3">
-                                <a class="d-flex gap-2 text-dark" href="#" style="text-decoration: none;">
+                            <div class="mt-3" style="max-height: 400px; overflow: auto;">
+                                @forelse (auth()->user()->notifications as $notification)
+                                <a class="d-flex gap-2 text-dark mb-1 p-1 rounded text-decoration-none position-relative"
+                                wire:click.prevent="markAsRead('{{ $notification->id }}')"
+                                style="background-color: {{ $notification->read_at ? 'transparent' : 'rgba(40, 39, 39, 0.100)' }};" href="/updates/{{ $notification->data['post_title'] }}" wire:navigate style="text-decoration: none;">
+                                @if (!$notification->read_at)
+                                <span class="rounded-circle bg-secondary position-absolute me-2 mt-2" style="width: 7px; height: 7px; display: inline-block; right: 0;"></span>
+                                @endif
                                     <span>
-                                        <img @if(auth()->user()->profile_picture === null)
+                                        <img @if($notification->data['poster_profile_picture'] === null)
                                         src="/images/profile.png"
                                         @else
-                                        src="{{ Storage::url(auth()->user()->profile_picture) }}"
+                                        src="{{ Storage::url($notification->data['poster_profile_picture']) }}"
                                         @endif
                                         alt="Profile Image"
                                         style="width: 30px; height: 30px;" class=" image-fluid rounded-circle">
                                     </span>
                                     <div class="notification-content" style="font-size: 13px;">
-                                        <span><strong>{{ auth()->user()->name }}</strong> @if(auth()->user()->gender ===
-                                            'Male') I'm so handsome @elseif(auth()->user()->gender === 'Female') I'm so
-                                            pretty @else I'm a gay/lesbian @endif</span>
+                                        <span><strong>{{ $notification->data['poster_name'] }}</strong> {{ $notification->data['post_body'] }}</span>
                                         <br>
-                                        <small class="text-muted">2 mins ago</small>
+                                        <small class="text-muted">
+                                            {{ \Carbon\Carbon::parse($notification->data['post_created_at'])->diffForHumans() < 1 ? 'Just now' : \Carbon\Carbon::parse($notification->data['post_created_at'])->diffForHumans() }}
+                                        </small>
                                     </div>
                                 </a>
+                                @empty
+                                <div class="py-4 text-center">
+                                    <i class="fas fa-bell-slash fs-3"></i>
+                                    <p>No notifications yet</p>
+                                </div>
+                                @endforelse
                                 <hr class="dropdown-divider">
                             </div>
                             <div class="d-flex justify-content-center">
-                                <button class="btn btn-link" style="font-size: 13px;">Mark all as read</button>
+                                <button type="button" class="btn btn-link" style="font-size: 13px;" wire:click='markAllAsRead'>Mark all as read</button>
                             </div>
                         </div>
                     </div>

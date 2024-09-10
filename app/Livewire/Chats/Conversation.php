@@ -206,7 +206,7 @@ class Conversation extends Component
         $escapedText = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 
         $urlPattern = '@(https?://[^\s<>"\'()]+\.[^\s<>"\'()]+)@i';
-        $convertedText = preg_replace($urlPattern, '<a href="$1" target="_blank" style="color: #095ad2;" title="$1"><strong>$1</strong></a>', $escapedText);
+        $convertedText = preg_replace($urlPattern, '<a href="$1" target="_blank" style="color: #095ad2; background-color: #000000c7; border-radius: 5px; padding: 2px 5px 2px 5px;" title="$1"><strong>$1</strong></a>', $escapedText);
 
         return $convertedText;
     }
@@ -266,9 +266,9 @@ class Conversation extends Component
             'is_seen'           =>              $receiverDetails->user_token === $user->user_token ? true : false,
         ]);
 
-        event(new MessageSent($chat));
-
         $this->rowCount = 1;
+
+        event(new MessageSent($chat));
 
         $this->reset(['message', 'attachment']);
 

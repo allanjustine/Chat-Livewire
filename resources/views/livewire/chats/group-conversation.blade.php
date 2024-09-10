@@ -412,7 +412,7 @@
             <div id="chatMessages" class="flex-grow-1 overflow-auto p-3 d-flex flex-column-reverse position-relative">
 
                 <button id="backToBottom" onclick="scrollToBottom()" class="btn btn-dark rounded-circle"
-                    style="position: fixed; display: none; left: 60%; transform: translateX(-50%); bottom: 90px; z-index: 9999;">
+                    style="position: fixed; display: none; left: 60%; transform: translateX(-50%); bottom: 100px; z-index: 9999;">
                     <i class="far fa-arrow-down"></i>
                 </button>
 
