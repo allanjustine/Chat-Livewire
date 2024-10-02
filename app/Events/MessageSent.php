@@ -12,8 +12,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
-class MessageSent implements ShouldBroadcastNow
+class MessageSent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -30,7 +31,7 @@ class MessageSent implements ShouldBroadcastNow
     public function broadcastOn()
     {
         return [
-            new Channel('sendMessage'),
+            new Channel('sendMessage.' . $this->chat->receiver_id),
         ];
     }
 }

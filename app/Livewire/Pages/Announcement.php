@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages;
 
+use App\Events\NotificationPost;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -63,7 +64,7 @@ class Announcement extends Component
     public function addPost()
     {
         $this->validate([
-            'post_title'            =>              ['required', 'min:1', 'max:30'],
+            'post_title'            =>              ['required', 'min:1', 'max:30', 'unique:announcements,post_title'],
             'post_content'          =>              ['required', 'min:1'],
             'post_attachment.*'     =>              ['max:5120', 'nullable', 'mimes:jpg,jpeg,png,gif,ico,webp,pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar,txt,html,css,php,js,ts,py,java,c,cpp,rb,go,swift,rs,scala,pl,r']
         ]);
@@ -109,6 +110,7 @@ class Announcement extends Component
             {
                 $user->notify(new AnnouncementNotification($announcementCreated));
             }
+            event(new NotificationPost($announcementCreated));
         }
     }
 
@@ -190,6 +192,8 @@ class Announcement extends Component
 
     public function updatePost()
     {
+        $userId = auth()->user()->id;
+
         $this->validate([
             'post_title'            =>              ['required', 'min:1', 'max:20'],
             'post_content'          =>              ['required', 'min:1'],
@@ -200,6 +204,13 @@ class Announcement extends Component
             $this->dispatch('toastr', [
                 'type'          =>          'error',
                 'message'       =>          'No post found to update',
+            ]);
+
+            return;
+        } elseif ($this->announcementToEdit->user_id != $userId) {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Sorry only author can update in this post',
             ]);
 
             return;
@@ -252,12 +263,21 @@ class Announcement extends Component
 
     public function delete($announcementId)
     {
+        $user = auth()->user();
+
+        $is_admin = $user->hasRole('admin');
+
         $toDelete = AnnouncementModel::find($announcementId);
 
         if (!$toDelete) {
             $this->dispatch('toastr', [
                 'type'          =>          'error',
                 'message'       =>          'Post already deleted/not found',
+            ]);
+        } elseif ($toDelete->user_id != $user->id && !$is_admin) {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Sorry only author/admin can delete in this post',
             ]);
         } else {
             if ($toDelete->post_attachment && count($toDelete->post_attachment) > 0) {

@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GroupChatMessageSent implements ShouldBroadcastNow
+class GroupChatMessageSent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -32,8 +32,12 @@ class GroupChatMessageSent implements ShouldBroadcastNow
      */
     public function broadcastOn(): array
     {
-        return [
-            new Channel('groupChatMessage'),
-        ];
+        $channels = [];
+
+        foreach ($this->chat as $item) {
+            $channels[] = new Channel('groupChatMessage.' . $item->id);
+        }
+
+        return $channels;
     }
 }

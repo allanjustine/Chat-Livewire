@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -44,27 +45,30 @@ class User extends Authenticatable
         ];
     }
 
-    public function senderChats()
+    public function senderChats(): HasMany
     {
         return $this->hasMany(Chat::class, 'sender_id')
             ->where('status', '!=', 'removed')
             ->where('receiver_id', auth()->user()->id)
-            ->where('deleted_by_receiver', false);
+            ->where('deleted_by_receiver', false)
+            ->chaperone();
     }
-    public function receiverChats()
+    public function receiverChats(): HasMany
     {
         return $this->hasMany(Chat::class, 'receiver_id')
             ->where('status', '!=', 'removed')
             ->where('sender_id', auth()->user()->id)
-            ->where('deleted_by_sender', false);
+            ->where('deleted_by_sender', false)
+            ->chaperone();
     }
 
-    public function unseenSenderChats()
+    public function unseenSenderChats(): HasMany
     {
         return $this->hasMany(Chat::class, 'sender_id')
             ->where('receiver_id', auth()->user()->id)
             ->where('is_seen', false)
-            ->where('deleted_by_receiver', false);
+            ->where('deleted_by_receiver', false)
+            ->chaperone();
     }
 
     public function groupChats()
@@ -74,23 +78,33 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function announcements()
+    public function announcements(): HasMany
     {
-        return $this->hasMany(Announcement::class);
+        return $this->hasMany(Announcement::class)->chaperone();
     }
 
-    public function likes()
+    public function likes(): HasMany
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(Like::class)->chaperone();
     }
 
-    public function chatReactions()
+    public function chatReactions(): HasMany
     {
-        return $this->hasMany(ChatReaction::class);
+        return $this->hasMany(ChatReaction::class)->chaperone();
     }
 
-    public function GroupChatReactions()
+    public function GroupChatReactions(): HasMany
     {
-        return $this->hasMany(GroupChatReaction::class);
+        return $this->hasMany(GroupChatReaction::class)->chaperone();
+    }
+
+    public function chatReplies(): HasMany
+    {
+        return $this->hasMany(ChatReply::class)->chaperone();
+    }
+
+    public function groupChatReplies(): HasMany
+    {
+        return $this->hasMany(GroupChatReply::class)->chaperone();
     }
 }

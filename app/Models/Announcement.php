@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Announcement extends Model
 {
@@ -21,13 +22,13 @@ class Announcement extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function likes()
+    public function likes(): HasMany
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(Like::class)->chaperone();
     }
 
-    public function comments()
+    public function comments(): HasMany
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->chaperone();
     }
 }

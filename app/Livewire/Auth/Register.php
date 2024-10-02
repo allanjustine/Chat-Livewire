@@ -16,13 +16,13 @@ class Register extends Component
 
     #[Title('Register')]
 
-    #[Validate(['image', 'max:102400', 'nullable'])]
+    #[Validate(['image', 'max:5120', 'nullable'])]
     public $profile_picture;
 
-    #[Validate(['required', 'min:5', 'max:50'])]
+    #[Validate(['required', 'min:5', 'max:30'])]
     public $name;
 
-    #[Validate(['required', 'date'])]
+    #[Validate(['required', 'date', 'before_or_equal:2010-12-31'])]
     public $date_of_birth;
 
     #[Validate(['required', 'in:Male,Female,Others'])]
@@ -34,10 +34,10 @@ class Register extends Component
     #[Validate(['required', 'numeric', 'digits:11'])]
     public $phone_number;
 
-    #[Validate(['required', 'min:5', 'max:20', 'unique:users,username'])]
+    #[Validate(['required', 'min:5', 'max:20', 'unique:users,username', 'regex:/^[a-zA-Z0-9_]+$/'])]
     public $username;
 
-    #[Validate(['required', 'min:5', 'max:100'])]
+    #[Validate(['required', 'min:5', 'max:30'])]
     public $address;
 
     #[Validate(['required', 'email', 'unique:users,email', 'regex:/^\S+@\S+\.\S+$/'])]
@@ -87,7 +87,15 @@ class Register extends Component
 
     }
 
+    public function messages()
+    {
+        return [
+            'date_of_birth.before_or_equal'         =>              'The date of birth must be on or before 2010',
+        ];
+    }
+
     public function render()
+
     {
         if (auth()->check()) {
             $this->redirect('/home', navigate: true);

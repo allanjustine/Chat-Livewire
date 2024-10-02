@@ -11,17 +11,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class IsSeen implements ShouldBroadcastNow
+class IsSeen implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $isSeen;
+    public $isOwnSeen;
     /**
      * Create a new event instance.
      */
-    public function __construct($isSeen)
+    public function __construct($isSeen, $isOwnSeen)
     {
         $this->isSeen = $isSeen;
+        $this->isOwnSeen = $isOwnSeen;
     }
 
     /**
@@ -32,7 +34,8 @@ class IsSeen implements ShouldBroadcastNow
     public function broadcastOn()
     {
         return [
-            new Channel('isSeen'),
+            new Channel('isSeen.' . $this->isSeen),
+            new Channel('isSeen.' . $this->isOwnSeen),
         ];
     }
 }

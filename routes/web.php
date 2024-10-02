@@ -1,6 +1,5 @@
 <?php
 
-use App\Events\MessageSent;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Chats\Conversation;
@@ -14,6 +13,7 @@ use App\Livewire\Pages\Landing;
 use App\Livewire\Pages\Profile;
 use App\Livewire\Pages\ProfileInfo;
 use App\Livewire\Users\Index as UsersIndex;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Landing::class);

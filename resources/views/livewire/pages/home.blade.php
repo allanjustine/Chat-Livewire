@@ -1,5 +1,5 @@
 <div>
-    <div class="bg-cover">
+    <div class="bg-cover position-relative">
         <div class="hero-text text-center">
             <h2>Welcome to Chat</h2>
             <p>Connect with people around the world in real-time.</p>

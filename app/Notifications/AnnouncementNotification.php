@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -25,7 +26,6 @@ class AnnouncementNotification extends Notification
         $this->poster = $user;
         $this->posterId = $user->id;
         $this->announcement = $announcement;
-
     }
 
     /**
@@ -44,9 +44,9 @@ class AnnouncementNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -58,6 +58,7 @@ class AnnouncementNotification extends Notification
     {
         return [
             'poster_name'                       =>              $this->poster->name,
+            'poster_username'                   =>              $this->poster->username,
             'poster_id'                         =>              $this->posterId,
             'poster_profile_picture'            =>              $this->poster->profile_picture,
             'post_title'                        =>              $this->announcement->post_title,

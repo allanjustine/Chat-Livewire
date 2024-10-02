@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Chat extends Model
 {
@@ -26,8 +27,13 @@ class Chat extends Model
         return $this->belongsTo(User::class, 'receiver_id');
     }
 
-    public function chatReactions()
+    public function chatReactions(): HasMany
     {
-        return $this->hasMany(ChatReaction::class);
+        return $this->hasMany(ChatReaction::class)->chaperone();
+    }
+
+    public function chatReplies(): HasMany
+    {
+        return $this->hasMany(ChatReply::class)->chaperone();
     }
 }

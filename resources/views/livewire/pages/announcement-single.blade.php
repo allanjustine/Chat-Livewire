@@ -2,7 +2,7 @@
     <div class="container d-flex justify-content-center" wire:poll.10s>
         <div class="col-md-6 col-12 mt-5">
             <div class="bg-dark text-light p-4 rounded shadow-sm position-relative">
-                <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px;">Posted on {{
+                <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px !important;">Posted on {{
                     $updatesData->created_at->format('F d, Y g:i A') }}</span>
                 <div class="text-light">
                     <div class="d-flex align-items-center mb-2">
@@ -93,7 +93,8 @@
                     <div class="carousel-inner">
                         @foreach ($images as $index => $image)
                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                            <img src="{{ Storage::url($image) }}" class="d-block w-100 carousel-image" alt="..." style="max-height: 400px; cursor: pointer;">
+                            <img src="{{ Storage::url($image) }}" class="d-block w-100 carousel-image" alt="..."
+                                style="max-height: 400px; cursor: pointer;">
                         </div>
                         @endforeach
                     </div>
@@ -113,7 +114,7 @@
                 @endif
                 <hr>
                 <span class="float-end" style="margin-top: -15px;">
-                    <a href="#" class="text-white" style="font-size: 13px;" data-bs-toggle="modal"
+                    <a href="#" class="text-white" style="font-size: 12px !important;" data-bs-toggle="modal"
                         data-bs-target="#commentPost{{ $updatesData->id }}">
                         {{ $updatesData->comments->count() <= 0 ? '' : $updatesData->comments->count() }}
                             @if ($updatesData->comments->count() <= 0) Be the first to comment @elseif($updatesData->
@@ -213,13 +214,13 @@
                                         class="far fa-trash"></i> <strong>Delete</strong></button></li>
                             <li
                                 onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $updatesData->post_title) }}'); return false;">
-                                <a class="dropdown-item" href="#"><i class="far fa-copy"></i>
+                                <a class="dropdown-item" href="#"><i class="far fa-link"></i>
                                     <strong>Copy Link</strong></a>
                             </li>
                             @else
                             <li
                                 onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $updatesData->post_title) }}'); return false;">
-                                <a class="dropdown-item" href="#"><i class="far fa-copy"></i>
+                                <a class="dropdown-item" href="#"><i class="far fa-link"></i>
                                     <strong>Copy Link</strong></a>
                             </li>
                             @endif
@@ -249,9 +250,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-3 rounded" style="background-color: #6060603c;">
+                <div class="mt-3 rounded">
                     @foreach ($updatesData->comments->sortByDesc('created_at') as $comment)
-                    <div class="mb-2">
+                    <div class="mb-1 rounded" style="background-color: #6060603c;">
                         <div style="position: absolute;" class="mt-1 ms-2">
                             <a href="/profile-info/{{ $comment->user->username }}">
                                 <img @if ($comment->user->profile_picture === null)
@@ -283,11 +284,9 @@
                                     class="text-light text-decoration-none" style="font-size: 11px;">Delete</a>
                                 @endif
                                 <span style="font-size: 11px;">
-                                    @if ($comment->created_at->diffForHumans() < 1)
-                                        Just now
-                                    @else
-                                        {{ $comment->created_at->diffForHumans() }}
-                                    @endif
+                                    @if ($comment->created_at->diffForHumans() < 1) Just now @else {{ $comment->
+                                        created_at->diffForHumans() }}
+                                        @endif
                                 </span>
                             </div>
                         </div>
@@ -309,7 +308,7 @@
                 </div>
                 <div class="modal-body m-0 p-0">
                     <div class="text-light p-4 rounded shadow-sm position-relative">
-                        <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px;">Posted on {{
+                        <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px !important;">Posted on {{
                             $updatesData->created_at->format('F d, Y g:i A') }}</span>
                         <div class="text-light">
                             <div class="d-flex align-items-center mb-2">
@@ -388,30 +387,27 @@
                         <div id="carouselExampleIndicators{{ $updatesData->id }}" class="carousel slide">
                             <div class="carousel-indicators">
                                 @foreach ($images as $index => $image)
-                                <button type="button"
-                                    data-bs-target="#carouselExampleIndicators{{ $updatesData->id }}"
-                                    data-bs-slide-to="{{ $index }}"
-                                    class="{{ $index === 0 ? 'active' : '' }}" aria-current="true"
-                                    aria-label="Slide {{ $index + 1 }}"></button>
+                                <button type="button" data-bs-target="#carouselExampleIndicators{{ $updatesData->id }}"
+                                    data-bs-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}"
+                                    aria-current="true" aria-label="Slide {{ $index + 1 }}"></button>
                                 @endforeach
                             </div>
                             <div class="carousel-inner">
                                 @foreach ($images as $index => $image)
                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                    <img src="{{ Storage::url($image) }}" class="d-block w-100" alt="..." style="max-height: 600px;">
+                                    <img src="{{ Storage::url($image) }}" class="d-block w-100" alt="..."
+                                        style="max-height: 600px;">
                                 </div>
                                 @endforeach
                             </div>
                             @if (count($updatesData->post_attachment) > 1)
                             <button class="carousel-control-prev" type="button"
-                                data-bs-target="#carouselExampleIndicators{{ $updatesData->id }}"
-                                data-bs-slide="prev">
+                                data-bs-target="#carouselExampleIndicators{{ $updatesData->id }}" data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Previous</span>
                             </button>
                             <button class="carousel-control-next" type="button"
-                                data-bs-target="#carouselExampleIndicators{{ $updatesData->id }}"
-                                data-bs-slide="next">
+                                data-bs-target="#carouselExampleIndicators{{ $updatesData->id }}" data-bs-slide="next">
                                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Next</span>
                             </button>
@@ -420,7 +416,7 @@
                         @endif
                         <hr>
                         <span class="float-end" style="margin-top: -15px;">
-                            <a href="#" class="text-white" style="font-size: 13px;">
+                            <a href="#" class="text-white" style="font-size: 12px !important;">
                                 {{ $updatesData->comments->count() <= 0 ? '' : $updatesData->comments->count() }}
                                     @if ($updatesData->comments->count() <= 0) Be the first to comment
                                         @elseif($updatesData->comments->count() == 1)
@@ -506,40 +502,31 @@
                                 <i class="far fa-thumbs-up"></i> Like
                             </button>
                             @endif
-                            <button class="btn btn-link text-decoration-none mt-2 text-white" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false"
-                                aria-controls="flush-collapseOne">
+                            <button class="btn btn-link text-decoration-none mt-2 text-white" type="button">
                                 <i class="far fa-comment-dots"></i> Comment
                             </button>
                         </div>
                     </div>
-                    <div class="accordion accordion-flush" id="accordionFlushExample">
-                        <div class="accordion-item bg-secondary rounded">
-                            <div wire:ignore.self id="flush-collapseOne" class="accordion-collapse collapse"
-                                data-bs-parent="#accordionFlushExample">
-                                <div class="accordion-body">
-                                    <div class="d-flex">
-                                        <textarea class="form-control flex-grow-1 me-2" rows="2"
-                                            placeholder='Write a comment to "{{ $updatesData->user->name }}" post...'
-                                            wire:model='comment_content'></textarea>
-                                        <button type="button" wire:click='postComment({{ $updatesData->id }})'
-                                            class="btn btn-primary btn-sm">
-                                            <div class="d-flex gap-2 align-items-center"><i
-                                                    class="far fa-comment-arrow-up"></i><span>Comment</span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                    @error('comment_content')
-                                    <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
-                                    @enderror
-                                </div>
+                    <div class="d-flex mx-3 mt-2">
+                        <textarea class="form-control flex-grow-1 me-2" rows="2"
+                            placeholder='Write a comment to "{{ $updatesData->user->name }}" post...'
+                            wire:model='comment_content'></textarea>
+                        <button type="button" wire:click='postComment({{ $updatesData->id }})'
+                            class="btn btn-primary btn-sm">
+                            <div class="d-flex gap-2 align-items-center"><i
+                                    class="far fa-comment-arrow-up"></i><span>Comment</span>
                             </div>
-                        </div>
+                        </button>
                     </div>
-                    <div class="px-4 mt-3 mx-2 rounded" style="background-color: #2a2a2a58;">
+                    @error('comment_content')
+                    <span class="mx-3 mt-2">
+                        <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
+                    </span>
+                    @enderror
+                    <div class="px-4 mt-3 mx-2 rounded">
                         @foreach ($updatesData->comments->sortByDesc('created_at') as $comment)
-                        <div class="mb-2">
-                            <div style="position: absolute;" class="mt-1">
+                        <div class="mb-1 rounded" style="background-color: #2a2a2a58;">
+                            <div style="position: absolute;" class="mt-1 ms-2">
                                 <a href="/profile-info/{{ $comment->user->username }}">
                                     <img @if ($comment->user->profile_picture === null)
                                     src="/images/profile.png"
@@ -570,11 +557,9 @@
                                         class="text-light text-decoration-none" style="font-size: 11px;">Delete</a>
                                     @endif
                                     <span style="font-size: 11px;">
-                                        @if ($comment->created_at->diffForHumans() < 1)
-                                            Just now
-                                        @else
-                                            {{ $comment->created_at->diffForHumans() }}
-                                        @endif
+                                        @if ($comment->created_at->diffForHumans() < 1) Just now @else {{ $comment->
+                                            created_at->diffForHumans() }}
+                                            @endif
                                     </span>
                                 </div>
                             </div>

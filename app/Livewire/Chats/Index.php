@@ -29,21 +29,24 @@ class Index extends Component
     public $loadMore = 5;
     public $load = 20;
     public $usersCount = 0;
+    public $authId;
 
     public function loadMorePage()
     {
         $this->load += $this->loadMore;
     }
 
-    #[On('echo:sendMessage,MessageSent')]
-    #[On('echo:isSeen,IsSeen')]
-    #[On('echo:groupChatMessage,GroupChatMessageSent')]
-    #[On('echo:gcIsSeen,GroupChatIsSeen')]
+    #[On('echo:sendMessage.{authId},MessageSent')]
+    #[On('echo:isSeen.{authId},IsSeen')]
+    #[On('echo:groupChatMessage.{authId},GroupChatMessageSent')]
+    #[On('echo:gcIsSeen.{authId},GroupChatIsSeen')]
     #[On('echo:gcCreated,GroupChatCreated')]
     #[On('echo:AddMemberToGcSuccess,AddMemberToGroupChat')]
     public function chats()
     {
         $user = auth()->user();
+
+        $this->authId = $user->id;
 
         $users = User::with(['senderChats', 'receiverChats'])->withCount('unseenSenderChats')->get()->sortByDesc(function ($user) {
             $allChats = $user->receiverChats->concat($user->senderChats)
@@ -59,7 +62,6 @@ class Index extends Component
 
         $searched = User::where('name', 'like', '%' . $this->search . '%')
             ->get();
-
 
         $totalChats = Chat::where('receiver_id', $user->id)
             ->where('is_seen', false)
@@ -127,14 +129,15 @@ class Index extends Component
 
     public function seen($userId)
     {
+        $userReceiverId = auth()->user()->id;
         $isSeen = Chat::where('sender_id', $userId)
-            ->where('receiver_id', auth()->user()->id)
+            ->where('receiver_id', $userReceiverId)
             ->where('is_seen', false)
             ->update([
                 'is_seen'       =>      true
             ]);
 
-        event(new SeenNow($isSeen));
+        event(new SeenNow($userId, $userReceiverId));
     }
 
     public function gcSeen($gcId)

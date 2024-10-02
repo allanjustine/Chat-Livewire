@@ -6,6 +6,7 @@ use App\Events\MessageSent;
 use App\Listeners\MessageListener;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Broadcast;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,9 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Event::listen(
-            MessageSent::class,
-            MessageListener::class,
-        );
+        Broadcast::routes(['middleware' => ['auth']]);
+
+        require base_path('routes/channels.php');
     }
 }

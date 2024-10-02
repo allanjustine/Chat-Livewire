@@ -7,6 +7,7 @@ use App\Events\MessageSent;
 use App\Events\IsSeen as SeenNow;
 use App\Models\Chat;
 use App\Models\ChatReaction;
+use App\Models\ChatReply;
 use App\Models\Emoji;
 use App\Models\GroupChat;
 use App\Models\User;
@@ -14,14 +15,13 @@ use Illuminate\Support\Facades\URL;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
+use App\Models\GroupChatContent;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 use Illuminate\Support\Str;
 
 class Conversation extends Component
 {
-    #[Title('Chats')]
-
     public $search = '';
     public $userConvo;
     public $previous;
@@ -35,6 +35,12 @@ class Conversation extends Component
     public $toSeen;
     public $emojis = [];
     public $emojiReaction = [];
+    public $idFromChat;
+    public $isReply = false;
+    public $replyContent;
+    public $unsentReply;
+    public $authId;
+    public $pageTitle;
 
     #[Validate(['nullable', 'max:5120'])]
     public $attachment = [];
@@ -50,17 +56,33 @@ class Conversation extends Component
         $this->loadMore += $this->loadMorePlus;
     }
 
-    #[On('echo:groupChatMessage,GroupChatMessageSent')]
-    #[On('echo:sendMessage,MessageSent')]
-    #[On('echo:isSeen,IsSeen')]
+    #[On('echo:groupChatMessage.{authId},GroupChatMessageSent')]
+    #[On('echo:sendMessage.{authId},MessageSent')]
     #[On('echo:AddMemberToGcSuccess,AddMemberToGroupChat')]
+    #[On('echo:isSeen.{authId},IsSeen')]
     public function conversation()
     {
         $user = auth()->user();
 
         $userId = $user->id;
 
-        $convos = Chat::with(['sender', 'chatReactions.emoji', 'chatReactions.user'])
+        $convos = Chat::with([
+            'sender',
+            'chatReactions.emoji',
+            'chatReactions.user',
+            'chatReplies.user',
+            'chatReplies.fromChat' => function ($query) use ($userId) {
+                $query->where(function ($subQuery) use ($userId) {
+                    $subQuery->where('sender_id', $this->userConvo->id)
+                        ->where('receiver_id', $userId)
+                        ->where('deleted_by_receiver', false);
+                })->orWhere(function ($subQuery) use ($userId) {
+                    $subQuery->where('sender_id', $userId)
+                        ->where('receiver_id', $this->userConvo->id)
+                        ->where('deleted_by_sender', false);
+                });
+            }
+        ])
             ->where(function ($query) use ($userId) {
                 $query->where(function ($subQuery) use ($userId) {
                     $subQuery->where('sender_id', $this->userConvo->id)
@@ -100,7 +122,14 @@ class Conversation extends Component
         //     }
         // }
 
-        $convosCount = Chat::with(['sender', 'receiver'])
+        $convosCount = Chat::with([
+            'sender',
+            'receiver',
+            'chatReactions.emoji',
+            'chatReactions.user',
+            'chatReplies.user',
+            'chatReplies.fromChat'
+        ])
             ->where(function ($query) use ($userId) {
                 $query->where(function ($subQuery) use ($userId) {
                     $subQuery->where('sender_id', $this->userConvo->id)
@@ -150,13 +179,7 @@ class Conversation extends Component
             ->withCount(['unseenSenderChats' => function ($query) {
                 $query->where('is_seen', false);
             }])
-            ->with(['senderChats' => function ($query) {
-                $query->whereNotNull('message')
-                    ->orWhereNotNull('attachment');
-            }, 'receiverChats' => function ($query) {
-                $query->whereNotNull('message')
-                    ->orWhereNotNull('attachment');
-            }])
+            ->with(['senderChats', 'receiverChats'])
             ->get()
             ->map(function ($user) use ($userId) {
                 $allChats = $user->receiverChats->concat($user->senderChats)
@@ -168,16 +191,16 @@ class Conversation extends Component
                 $user->latest_chat_created_at = $latestChat->created_at ?? null;
                 return $user;
             });
-        $groupChats = GroupChat::whereHas('groupChatMembers', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
+        $groupChats = GroupChat::whereHas('groupChatMembers', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
         })
             ->where(function ($query) {
                 $query->where('group_chat_name', 'like', '%' . $this->search . '%');
             })
-            ->withCount(['groupChatContents as unseen_count' => function ($query) use ($user) {
-                $query->where('user_id', '!=', $user->id)
-                    ->whereDoesntHave('groupChatSeenBies', function ($subQuery) use ($user) {
-                        $subQuery->where('user_id', $user->id);
+            ->withCount(['groupChatContents as unseen_count' => function ($query) use ($userId) {
+                $query->where('user_id', '!=', $userId)
+                    ->whereDoesntHave('groupChatSeenBies', function ($subQuery) use ($userId) {
+                        $subQuery->where('user_id', $userId);
                     });
             }])
             ->whereHas('groupChatContents')
@@ -188,17 +211,20 @@ class Conversation extends Component
                 return $groupChat;
             });
 
-        $combined = $users->map(function ($user) {
-            $user->type = 'user';
-            return $user;
-        })->merge(
-            $groupChats->map(function ($groupChat) {
-                $groupChat->type = 'groupChat';
-                return $groupChat;
-            })
-        )->sortByDesc('latest_chat_created_at');
+        $allChats = $users->concat($groupChats)
+            ->sortByDesc('latest_chat_created_at');
 
-        return compact('combined');
+        // $combined = $users->map(function ($user) {
+        //     $user->type = 'user';
+        //     return $user;
+        // })->merge(
+        //     $groupChats->map(function ($groupChat) {
+        //         $groupChat->type = 'groupChat';
+        //         return $groupChat;
+        //     })
+        // )->sortByDesc('latest_chat_created_at');
+
+        return compact('allChats');
     }
 
     protected function escapeAndConvertUrlsToLinks($text)
@@ -216,6 +242,7 @@ class Conversation extends Component
         $convo = User::with(['senderChats', 'receiverChats'])
             ->where('user_token', $userToken)
             ->first();
+        $this->authId = auth()->user()->id;
 
         $this->previous = URL::previous();
 
@@ -228,7 +255,7 @@ class Conversation extends Component
         $this->emojis = Emoji::orderBy('id', 'asc')
             ->get();
 
-        $this->emojiReaction = Emoji::whereIn('id', [7, 8, 14, 51, 52, 155, 1042])
+        $this->emojiReaction = Emoji::whereIn('id', [5, 8, 14, 51, 52, 155, 1042])
             ->get();
     }
 
@@ -268,7 +295,23 @@ class Conversation extends Component
 
         $this->rowCount = 1;
 
-        event(new MessageSent($chat));
+        if ($this->isReply) {
+            ChatReply::create([
+                'user_id'             =>            $user->id,
+                'from_chat_id'        =>            $this->idFromChat,
+                'chat_id'             =>            $chat->id
+            ]);
+
+            $this->idFromChat = null;
+
+            $this->isReply = false;
+
+            $this->replyContent = '';
+
+            $this->unsentReply = '';
+        }
+
+        broadcast(new MessageSent($chat))->toOthers();
 
         $this->reset(['message', 'attachment']);
 
@@ -294,7 +337,23 @@ class Conversation extends Component
             'is_seen'           =>              $receiverDetails->user_token === $user->user_token ? true : false,
         ]);
 
-        event(new MessageSent($chat));
+        if ($this->isReply) {
+            ChatReply::create([
+                'user_id'             =>            $user->id,
+                'from_chat_id'        =>            $this->idFromChat,
+                'chat_id'             =>            $chat->id
+            ]);
+
+            $this->idFromChat = null;
+
+            $this->isReply = false;
+
+            $this->replyContent = '';
+
+            $this->unsentReply = '';
+        }
+
+        broadcast(new MessageSent($chat))->toOthers();
 
         $this->dispatch('scrollBot');
     }
@@ -302,9 +361,11 @@ class Conversation extends Component
 
     public function removeForEveryone($convoId)
     {
+        $userId = auth()->user()->id;
+
         $chat = Chat::find($convoId);
 
-        if (!$chat) {
+        if (!$chat || $chat->sender_id !== $userId) {
             $this->dispatch('toastr', [
                 'type'          =>          'error',
                 'message'       =>          'Failed to unsent',
@@ -316,7 +377,7 @@ class Conversation extends Component
                 'status'        =>          'unsent'
             ]);
 
-            event(new MessageSent($chat));
+            broadcast(new MessageSent($chat))->toOthers();
         }
     }
 
@@ -361,7 +422,7 @@ class Conversation extends Component
             ->update([
                 'is_seen'       =>      true
             ]);
-        event(new SeenNow($isSeen));
+        event(new SeenNow($userId, $userReceiverId));
     }
 
     public function gcSeen($gcId)
@@ -376,9 +437,12 @@ class Conversation extends Component
         foreach ($groupChat->groupChatContents as $content) {
             if ($content->user_id != $user->id && !$content->groupChatSeenBies()->where('user_id', $user->id)->exists()) {
                 $content->groupChatSeenBies()->attach($user->id);
-                event(new GroupChatIsSeen($content));
             }
         }
+
+        $member = $groupChat->groupChatMembers;
+
+        event(new GroupChatIsSeen($member));
     }
 
     public function deleteConversation($userId)
@@ -484,12 +548,10 @@ class Conversation extends Component
             ->where('chat_id', $convoId)
             ->first();
 
-        if($reaction)
-        {
+        if ($reaction) {
             $reaction->delete();
 
             $this->dispatch('closeModal', ['convoId' => $convoId]);
-
         } else {
             ChatReaction::updateOrCreate([
                 'user_id'           =>              $user->id,
@@ -499,12 +561,39 @@ class Conversation extends Component
         }
     }
 
+    public function replyToChat($convoId)
+    {
+        $reply = Chat::find($convoId);
+
+        if (!$reply) {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Cannot reply message not found'
+            ]);
+
+            return;
+        }
+
+        $this->idFromChat = $convoId;
+        $this->isReply = true;
+        $this->replyContent = $reply->message;
+        $this->unsentReply = $reply->status;
+    }
+
+    public function cancelReply()
+    {
+        $this->isReply = false;
+        $this->idFromChat = null;
+        $this->replyContent = '';
+        $this->unsentReply = '';
+    }
+
     public function render()
     {
         return view(
             'livewire.chats.conversation',
             $this->conversation(),
             $this->userList(),
-        );
+        )->title('Chat - ' . $this->userConvo->name);
     }
 }

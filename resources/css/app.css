@@ -18,46 +18,46 @@ body {
     align-items: center;
 }
 
-
 .lds-facebook,
 .lds-facebook div {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 .lds-facebook {
-  display: inline-block;
-  position: relative;
-  width: 80px;
-  height: 80px;
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
 }
 .lds-facebook div {
-  display: inline-block;
-  position: absolute;
-  left: 8px;
-  width: 16px;
-  background: #ebeaea;
-  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+    display: inline-block;
+    position: absolute;
+    left: 8px;
+    width: 16px;
+    background: #ebeaea;
+    animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
 }
 .lds-facebook div:nth-child(1) {
-  left: 8px;
-  animation-delay: -0.24s;
+    left: 8px;
+    animation-delay: -0.24s;
 }
 .lds-facebook div:nth-child(2) {
-  left: 32px;
-  animation-delay: -0.12s;
+    left: 32px;
+    animation-delay: -0.12s;
 }
 .lds-facebook div:nth-child(3) {
-  left: 56px;
-  animation-delay: 0s;
+    left: 56px;
+    animation-delay: 0s;
 }
 @keyframes lds-facebook {
-  0% {
-    top: 8px;
-    height: 64px;
-  }
-  50%, 100% {
-    top: 24px;
-    height: 32px;
-  }
+    0% {
+        top: 8px;
+        height: 64px;
+    }
+    50%,
+    100% {
+        top: 24px;
+        height: 32px;
+    }
 }
 
 /* General skeleton styles */
@@ -108,3 +108,35 @@ body {
     margin-left: 10px;
 }
 
+.card {
+    --bs-card-spacer-y: 1.25rem;
+    --bs-card-spacer-x: 1.25rem;
+    --bs-card-title-spacer-y: 0.5rem;
+    --bs-card-title-color: var(--bs-emphasis-color);
+    --bs-card-subtitle-color: ;
+    --bs-card-border-width: 0;
+    --bs-card-border-color: transparent;
+    --bs-card-border-radius: 0.25rem;
+    --bs-card-box-shadow: ;
+    --bs-card-inner-border-radius: 0.25rem;
+    --bs-card-cap-padding-y: 1rem;
+    --bs-card-cap-padding-x: 1.25rem;
+    --bs-card-cap-bg: var(--bs-secondary-bg);
+    --bs-card-cap-color: ;
+    --bs-card-height: ;
+    --bs-card-color: ;
+    --bs-card-bg: var(--bs-secondary-bg);
+    --bs-card-img-overlay-padding: 1rem;
+    --bs-card-group-margin: 12px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: var(--bs-card-height);
+    color: var(--bs-body-color);
+    word-wrap: break-word;
+    background-color: var(--bs-card-bg);
+    background-clip: border-box;
+    border: var(--bs-card-border-width) solid var(--bs-card-border-color);
+    border-radius: var(--bs-card-border-radius);
+}

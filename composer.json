@@ -9,15 +9,17 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-debugbar": "^3.13",
         "laravel/framework": "^11.9",
         "laravel/reverb": "@beta",
         "laravel/sanctum": "^4.0",
+        "laravel/telescope": "^5.1",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
+        "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-permission": "^6.9"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.13",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",

@@ -10,19 +10,19 @@
                         <input type="text" class="form-control" id="username_or_email" name="username_or_email"
                             wire:model='username_or_email'>
                         @error('username_or_email')
-                        <span class="text-danger">{{ $message }}</span>
+                        <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" wire:model='password'>
                         @error('password')
-                        <span class="text-danger">{{ $message }}</span>
+                        <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
                     <div class="form-group mb-2 align-items-center d-flex gap-1">
                         <input type="checkbox" id="remember_me" wire:model="remember" style="cursor: pointer;">
-                        <label for="remember">Remember Me</label>
+                        <label for="remember"><small>Remember Me</small></label>
                     </div>
                     <button type="submit" class="btn btn-primary form-control btn-sm">
                         <span wire:loading.remove>Login</span>

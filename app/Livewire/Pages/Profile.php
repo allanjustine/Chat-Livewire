@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
@@ -25,6 +26,10 @@ class Profile extends Component
     public $email;
     public $nickname;
     public $bio;
+    public $current_password;
+    public $new_password;
+    public $new_password_confirmation;
+    public $activeTab = 'account';
 
     public function profile()
     {
@@ -43,22 +48,24 @@ class Profile extends Component
         return compact('user');
     }
 
+
+
     public function updateProfile()
     {
         $user = auth()->user();
 
         $this->validate([
-            'profile_picture'           =>              ['image', 'max:102400', 'nullable'],
-            'name'                      =>              ['required', 'min:5', 'max:50'],
-            'date_of_birth'             =>              ['required', 'date'],
+            'profile_picture'           =>              ['image', 'max:5120', 'nullable', 'mimes:jpg,jpeg,png,gif,ico,webp'],
+            'name'                      =>              ['required', 'min:5', 'max:30'],
+            'date_of_birth'             =>              ['required', 'date', 'before_or_equal:2010-12-31'],
             'gender'                    =>              ['required', 'in:Male,Female,Others'],
             'age'                       =>              ['required', 'numeric', 'min:1', 'max:99'],
             'phone_number'              =>              ['required', 'numeric', 'digits:11'],
-            'username'                  =>              ['required', 'min:5', 'max:20'],
-            'address'                   =>              ['required', 'min:5', 'max:100'],
+            'username'                  =>              ['required', 'min:5', 'max:20', 'regex:/^[a-zA-Z0-9_]+$/', 'unique:users,username,' . $user->id],
+            'address'                   =>              ['required', 'min:5', 'max:30'],
             'email'                     =>              ['required', 'email', 'regex:/^\S+@\S+\.\S+$/', 'unique:users,email,' . $user->id],
-            // 'nickname'                  =>              ['required', 'min:1', 'max:255'],
-            // 'bio'                       =>              ['required', 'min:1', 'max:255']
+            'nickname'                  =>              ['min:1', 'max:10'],
+            'bio'                       =>              ['min:1', 'max:100']
 
 
         ]);
@@ -94,6 +101,46 @@ class Profile extends Component
             'type'          =>          'success',
             'message'       =>          'Profile updated successfully',
         ]);
+    }
+
+    public function messages()
+    {
+        return [
+            'date_of_birth.before_or_equal'         =>              'The date of birth must be on or before 2010',
+        ];
+    }
+
+    public function setActiveTab($tab)
+    {
+        $this->activeTab = $tab;
+    }
+
+    public function passwordChange()
+    {
+        $user = auth()->user();
+
+        $this->validate([
+            'current_password'              =>                  ['required', 'required_with:new_password'],
+            'new_password'                  =>                  ['required', 'required-with:current_passowrd', 'different:current_password', 'min:6', 'confirmed']
+        ]);
+
+        if (!Hash::check($this->current_password, $user->password)) {
+            $this->addError('current_password', 'Your current password is incorrect');
+
+            return;
+        } else {
+
+            $user->update([
+                'password'          =>              $this->new_password
+            ]);
+
+            $this->dispatch('toastr', [
+                'type'              =>              'success',
+                'message'           =>              'Password change successfully'
+            ]);
+
+            $this->reset(['current_password', 'new_password', 'new_password_confirmation']);
+        }
     }
 
     public function render()

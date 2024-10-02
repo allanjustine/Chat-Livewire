@@ -26,7 +26,8 @@
                                     <label for="post_title" class="form-label">Title</label>
                                     <input type="text" id="post_title" class="form-control" wire:model="post_title"
                                         placeholder="Enter a post title">
-                                    @error('post_title') <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span> @enderror
+                                    @error('post_title') <span class="text-danger bg-primary-subtle rounded">{{ $message
+                                        }}</span> @enderror
                                 </div>
 
                                 <div class="mb-2 col-6">
@@ -39,7 +40,8 @@
                                         <option value="branch">For Branch</option>
                                         <option value="ho">For Head Office</option>
                                     </select>
-                                    @error('post_category') <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span> @enderror
+                                    @error('post_category') <span class="text-danger bg-primary-subtle rounded">{{
+                                        $message }}</span> @enderror
                                 </div>
                             </div>
 
@@ -48,7 +50,8 @@
                                 <input type="file" id="post_attachment" multiple class="form-control"
                                     accept=".jpg,.jpeg,.png,.gif,.ico,.webp,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.txt,.html,.css,.php,.js,.ts,.py,.java,.c,.cpp,.rb,.go,.swift,.rs,.scala,.pl,.r"
                                     wire:model="post_attachment">
-                                @error('post_attachment.*') <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span> @enderror
+                                @error('post_attachment.*') <span class="text-danger bg-primary-subtle rounded">{{
+                                    $message }}</span> @enderror
 
                                 <span class="text-light mt-2" wire:loading wire:target="post_attachment">
                                     <i class="fa-duotone fa-solid fa-spinner-third fa-spin"></i>
@@ -104,7 +107,7 @@
             <div class="col-md-6 col-lg-4">
                 @forelse ($announcements as $announcement)
                 <div class="mb-4 bg-dark text-light p-4 rounded shadow-sm position-relative">
-                    <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px;">Posted on {{
+                    <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px !important;">Posted on {{
                         $announcement->created_at->format('F d, Y g:i A') }}</span>
                     <div class="text-light">
                         <div class="d-flex align-items-center mb-2">
@@ -216,7 +219,7 @@
                     @endif
                     <hr>
                     <span class="float-end" style="margin-top: -15px;"><a href="#" class="text-white"
-                            style="font-size: 13px;" data-bs-toggle="modal"
+                            style="font-size: 12px !important;" data-bs-toggle="modal"
                             data-bs-target="#commentPost{{ $announcement->id }}">{{ $announcement->comments->count() <=
                                 0 ? '' : $announcement->comments->count() }}
                                 @if ($announcement->comments->count() <= 0) Be the first to comment
@@ -321,7 +324,7 @@
                                             class="far fa-trash"></i> <strong>Delete</strong></button></li>
                                 <li
                                     onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $announcement->post_title) }}'); return false;">
-                                    <a class="dropdown-item" href="#"><i class="far fa-copy"></i>
+                                    <a class="dropdown-item" href="#"><i class="fas fa-link"></i>
                                         <strong>Copy Link</strong></a>
                                 </li>
                                 @else
@@ -331,7 +334,7 @@
                                 @endrole
                                 <li
                                     onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $announcement->post_title) }}'); return false;">
-                                    <a class="dropdown-item" href="#"><i class="far fa-copy"></i>
+                                    <a class="dropdown-item" href="#"><i class="fas fa-link"></i>
                                         <strong>Copy Link</strong></a>
                                 </li>
                                 @endif
@@ -420,7 +423,7 @@
                             <div class="modal-body m-0 p-0">
                                 <div class="text-light p-4 rounded shadow-sm position-relative">
                                     <span class="position-absolute top-0 end-0 pe-2 pt-2"
-                                        style="font-size: 12px;">Posted on {{
+                                        style="font-size: 12px !important;">Posted on {{
                                         $announcement->created_at->format('F d, Y g:i A') }}</span>
                                     <div class="text-light">
                                         <div class="d-flex align-items-center mb-2">
@@ -533,7 +536,7 @@
                                     @endif
                                     <hr>
                                     <span class="float-end" style="margin-top: -15px;"><a href="#" class="text-white"
-                                            style="font-size: 13px;">{{ $announcement->comments->count() <= 0 ? '' :
+                                            style="font-size: 12px !important;">{{ $announcement->comments->count() <= 0 ? '' :
                                                 $announcement->comments->count() }}
                                                 @if ($announcement->comments->count() <= 0) Be the first to comment
                                                     @elseif ($announcement->comments->count() == 1)
@@ -621,44 +624,32 @@
                                             <i class="far fa-thumbs-up"></i> Like
                                         </button>
                                         @endif
-                                        <button class="btn btn-link text-decoration-none mt-2 text-white" type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#flush-collapseOne{{ $announcement->id }}"
-                                            aria-expanded="false"
-                                            aria-controls="flush-collapseOne{{ $announcement->id }}">
-                                            <i class="far fa-comment-dots"></i> Comment
+                                        <button class="btn btn-link text-decoration-none mt-2 text-white" type="button">
+                                            <i class="far fa-comment-dots"></i>
+                                            Comment
                                         </button>
                                     </div>
                                 </div>
-                                <div class="accordion accordion-flush" id="accordionFlushExample">
-                                    <div class="accordion-item bg-secondary rounded">
-                                        <div wire:ignore.self id="flush-collapseOne{{ $announcement->id }}"
-                                            class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                                            <div class="accordion-body">
-                                                <div class="d-flex">
-                                                    <textarea id="commentTextArea" class="form-control flex-grow-1 me-2"
-                                                        rows="2"
-                                                        placeholder='Write a comment to "{{ $announcement->user->name }}" post...'
-                                                        wire:model='comment_content'></textarea>
-                                                    <button type="button"
-                                                        wire:click='postComment({{ $announcement->id }})'
-                                                        class="btn btn-primary btn-sm">
-                                                        <div class="d-flex gap-2 align-items-center"><i
-                                                                class="far fa-comment-arrow-up"></i><span>Comment</span>
-                                                        </div>
-                                                    </button>
-                                                </div>
-                                                @error('comment_content')
-                                                <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
-                                                @enderror
-                                            </div>
+                                <div class="d-flex mx-3 mt-2">
+                                    <textarea id="commentTextArea" class="form-control flex-grow-1 me-2" rows="2"
+                                        placeholder='Write a comment to "{{ $announcement->user->name }}" post...'
+                                        wire:model='comment_content'></textarea>
+                                    <button type="button" wire:click='postComment({{ $announcement->id }})'
+                                        class="btn btn-primary btn-sm">
+                                        <div class="d-flex gap-2 align-items-center"><i
+                                                class="far fa-comment-arrow-up"></i><span>Comment</span>
                                         </div>
-                                    </div>
+                                    </button>
                                 </div>
-                                <div class="px-4 mt-3 rounded mx-2" style="background-color: #2a2a2a58;">
+                                @error('comment_content')
+                                <span class="mx-3 mt-2">
+                                    <span class="text-danger bg-primary-subtle rounded">{{ $message }}</span>
+                                </span>
+                                @enderror
+                                <div class="px-4 mt-3 rounded mx-2">
                                     @foreach ($announcement->comments->sortByDesc('created_at') as $comment)
-                                    <div class="mb-2">
-                                        <div style="position: absolute;" class="mt-1">
+                                    <div class="mb-1 rounded" style="background-color: #2a2a2a58;">
+                                        <div style="position: absolute;" class="mt-1 ms-2">
                                             <a href="/profile-info/{{ $comment->user->username }}" wire:navigate>
                                                 <img @if ($comment->user->profile_picture === null)
                                                 src="/images/profile.png"

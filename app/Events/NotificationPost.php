@@ -11,16 +11,17 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GroupChatIsSeen implements ShouldBroadcast
+class NotificationPost implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $gcSeen;
+
+    public $announcement;
     /**
      * Create a new event instance.
      */
-    public function __construct($gcSeen)
+    public function __construct($announcement)
     {
-        $this->gcSeen = $gcSeen;
+        $this->announcement = $announcement;
     }
 
     /**
@@ -30,12 +31,8 @@ class GroupChatIsSeen implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        $channels = [];
-
-        foreach ($this->gcSeen as $item) {
-            $channels[] = new Channel('gcIsSeen.' . $item->id);
-        }
-
-        return $channels;
+        return [
+            new Channel('announcementPost'),
+        ];
     }
 }

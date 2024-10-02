@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GroupChatContent extends Model
 {
@@ -39,8 +40,13 @@ class GroupChatContent extends Model
             ->withTimestamps();
     }
 
-    public function GroupChatReactions()
+    public function GroupChatReactions(): HasMany
     {
-        return $this->hasMany(GroupChatReaction::class);
+        return $this->hasMany(GroupChatReaction::class)->chaperone();
+    }
+
+    public function groupChatReplies(): HasMany
+    {
+        return $this->hasMany(GroupChatReply::class)->chaperone();
     }
 }

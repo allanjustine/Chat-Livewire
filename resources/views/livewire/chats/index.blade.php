@@ -74,8 +74,8 @@
                         alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $user->name }}</span>
                         @if ($user->unseen_sender_chats_count > 0)
-                        <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{
-                            $user->unseen_sender_chats_count > 9 ? '9+' : $user->unseen_sender_chats_count }}</span>
+                        <div class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{
+                            $user->unseen_sender_chats_count > 9 ? '9+' : $user->unseen_sender_chats_count }}</div>
                         @endif
                     </li>
                 </a>
@@ -123,8 +123,8 @@
                             alt="GC Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $gc->group_chat_name }}</span>
                         @if ($gc->unseen_count > 0)
-                        <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">
-                            {{ $gc->unseen_count > 9 ? '9+' : $gc->unseen_count }}</span>
+                        <div class="badge text-bg-primary ms-auto" style="font-size: 7px;">
+                            {{ $gc->unseen_count > 9 ? '9+' : $gc->unseen_count }}</div>
                         @endif
                     </li>
                 </a>
@@ -206,8 +206,8 @@
                         alt="Profile Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $user->name }}</span>
                         @if ($user->unseen_sender_chats_count > 0)
-                        <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{
-                            $user->unseen_sender_chats_count > 9 ? '9+' : $user->unseen_sender_chats_count }}</span>
+                        <div class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{
+                            $user->unseen_sender_chats_count > 9 ? '9+' : $user->unseen_sender_chats_count }}</div>
                         @endif
                     </li>
                 </a>
@@ -255,7 +255,7 @@
                             alt="GC Image" class="rounded-circle">
                         <span class="ms-2 text-start" style="font-size: 12px;">{{ $gc->group_chat_name }}</span>
                         @if ($gc->unseen_count > 0)
-                        <span class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{ $gc->unseen_count > 9 ? '9+' : $gc->unseen_count }}</span>
+                        <div class="badge text-bg-primary ms-auto" style="font-size: 7px;">{{ $gc->unseen_count > 9 ? '9+' : $gc->unseen_count }}</div>
                         @endif
                     </li>
                 </a>
