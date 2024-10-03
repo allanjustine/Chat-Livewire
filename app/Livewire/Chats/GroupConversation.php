@@ -584,6 +584,11 @@ class GroupConversation extends Component
                 'group_chat_content_id'             =>              $convoId
             ]);
         }
+
+        $member = $this->groupConvo->groupChatMembers;
+
+        event(new GroupChatMessageSent($member));
+
     }
 
     public function addMemberToGc()

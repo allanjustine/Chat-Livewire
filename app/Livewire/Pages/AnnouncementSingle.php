@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\Like;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -27,6 +28,12 @@ class AnnouncementSingle extends Component
             $this->redirect('/updates/post-not-found-or-deleted/404', navigate: true);
         }
         $this->updatesData = $updates;
+    }
+
+    #[On('refreshDataFromSingle')]
+    public function singleData()
+    {
+        return $this->updatesData;
     }
 
     public function like($announcementId)
@@ -135,8 +142,7 @@ class AnnouncementSingle extends Component
             'comment_content'       =>              ['required', 'min:1', 'max:255']
         ]);
 
-        if(!$post)
-        {
+        if (!$post) {
             $this->dispatch('toastr', [
                 'type'          =>          'error',
                 'message'       =>          'Failed to comment no post found',
@@ -156,14 +162,31 @@ class AnnouncementSingle extends Component
     {
         $comment = Comment::find($commentId);
 
-        if(!$comment)
-        {
+        if (!$comment) {
             $this->dispatch('toastr', [
                 'type'          =>          'error',
                 'message'       =>          'Comment already deleted/not found',
             ]);
         } else {
             $comment->delete();
+        }
+    }
+
+    public function share($postId)
+    {
+        $post = Announcement::find($postId);
+
+        if (!$post) {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Post not found',
+            ]);
+
+            return;
+        } else {
+            $post->increment('shares');
+
+            $this->dispatch('refreshDataFromSingle');
         }
     }
 

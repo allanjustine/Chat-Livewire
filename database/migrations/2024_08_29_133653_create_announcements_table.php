@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('announcements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable();
+            $table->integer('shares')->nullable();
             $table->longText('post_content')->nullable();
             $table->longText('post_attachment')->nullable();
             $table->string('post_title')->nullable();

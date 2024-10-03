@@ -349,6 +349,23 @@ class Announcement extends Component
         }
     }
 
+    public function share($postId)
+    {
+        $post = AnnouncementModel::find($postId);
+
+        if(!$post)
+        {
+            $this->dispatch('toastr', [
+                'type'          =>          'error',
+                'message'       =>          'Post not found',
+            ]);
+
+            return;
+        } else {
+            $post->increment('shares');
+        }
+    }
+
     public function render()
     {
         return view('livewire.pages.announcement', $this->index());

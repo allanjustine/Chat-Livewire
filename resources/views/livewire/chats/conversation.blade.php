@@ -29,7 +29,8 @@
                         <span class="online-dot"></span>
                         <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="Group Chat Image" class="rounded-circle">
-                        <span class="ms-2 text-start" style="font-size: 12px !important;">{{ $item->group_chat_name }}</span>
+                        <span class="ms-2 text-start" style="font-size: 12px !important;">{{ $item->group_chat_name
+                            }}</span>
                         @if ($item->unseen_count > 0)
                         <div class="badge text-bg-primary ms-auto" style="font-size: 7px;">
                             {{ $item->unseen_count > 9 ? '9+' : $item->unseen_count }}
@@ -90,7 +91,8 @@
                         <span class="online-dot"></span>
                         <img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" width="25" height="25"
                             alt="Group Chat Image" class="rounded-circle">
-                        <span class="ms-2 text-start" style="font-size: 12px !important;">{{ $item->group_chat_name }}</span>
+                        <span class="ms-2 text-start" style="font-size: 12px !important;">{{ $item->group_chat_name
+                            }}</span>
                         @if ($item->unseen_count > 0)
                         <div class="badge text-bg-primary ms-auto" style="font-size: 7px;">
                             {{ $item->unseen_count > 9 ? '9+' : $item->unseen_count }}
@@ -182,7 +184,8 @@
 
 
             <div class="bg-danger" wire:offline>
-                <h6 class="text-center" style="font-size: 12px !important;">Whoops, your device has lost connection. The web page
+                <h6 class="text-center" style="font-size: 12px !important;">Whoops, your device has lost connection. The
+                    web page
                     you are viewing is offline.</h6>
             </div>
             <div id="chatMessages" class="flex-grow-1 overflow-auto p-3 d-flex flex-column-reverse position-relative">
@@ -197,9 +200,11 @@
                 $unreadSeparatorShown = false;
 
                 @endphp
-                <span class="text-white text-end" style="font-size: 12px !important;" wire:loading wire:target='sendMessage'>
+                <span class="text-white text-end" style="font-size: 12px !important;" wire:loading
+                    wire:target='sendMessage'>
                     Sending...
                 </span>
+                <div class="{{ $isTyping ? 'd-block' : 'd-none' }}">User is typing...</div>
                 @forelse ($convos as $index => $convo)
                 @if ($convo->created_at->eq($latestMessageTimestamp) && auth()->user()->id === $convo->sender_id)
                 <span class="text-white text-end" style="font-size: 12px !important;" wire:loading.remove
@@ -305,7 +310,8 @@
                                         auth()->id();
                                         });
                                         @endphp
-                                        <button type="button" class="btn m-0 p-0 fs-4 btn-link text-decoration-none"
+                                        <button wire:key='{{ $emoji->id }}' type="button"
+                                            class="btn m-0 p-0 fs-4 btn-link text-decoration-none"
                                             style="{{ $userReaction ? 'background-color: rgba(156, 151, 151, 0.500); color: white;' : '' }}"
                                             wire:click="handleEmojiClick({{ $emoji->id }}, {{ $convo->id }})">{{
                                             $emoji->value }}</button>
@@ -713,7 +719,8 @@
                                         auth()->id();
                                         });
                                         @endphp
-                                        <button type="button" class="btn m-0 p-0 fs-4 btn-link text-decoration-none"
+                                        <button wire:key='{{ $emoji->id }}' type="button"
+                                            class="btn m-0 p-0 fs-4 btn-link text-decoration-none"
                                             style="{{ $userReaction ? 'background-color: rgba(156, 151, 151, 0.500); color: white;' : '' }}"
                                             wire:click="handleEmojiClick({{ $emoji->id }}, {{ $convo->id }})">{{
                                             $emoji->value }}</button>
@@ -958,7 +965,8 @@
                                         wire:target='sendMessage' wire:model='message' rows="{{ $rowCount }}"
                                         @keydown.enter="submitForm(event)"
                                         @keydown.shift.enter="handleShiftEnter(event)"
-                                        oninput="adjustTextArea(this)"></textarea>
+                                        oninput="adjustTextArea(this)"
+                                        ></textarea>
                                 </div>
                                 <div class="mb-1 d-flex align-items-end">
                                     <div class="dropup mt-1 dropup">
@@ -1355,6 +1363,5 @@
             }
        });
     </script> --}}
-
 
 </div>

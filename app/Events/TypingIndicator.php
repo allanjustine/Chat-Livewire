@@ -2,37 +2,38 @@
 
 namespace App\Events;
 
-use App\Models\Chat;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
-class MessageSent implements ShouldBroadcast
+class TypingIndicator implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public $chat;
 
-    public function __construct($chat)
+    public $user;
+    public function __construct($user)
     {
-        $this->chat = $chat;
+        $this->user = $user;
     }
 
-    public function broadcastOn()
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastOn(): array
     {
         return [
-            new Channel('sendMessage.' . $this->chat->receiver_id),
-            new Channel('sendMessage.' . $this->chat->sender_id),
+            new PrivateChannel('typingUser.' . $this->user->id),
         ];
     }
 }

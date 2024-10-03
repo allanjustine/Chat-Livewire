@@ -206,19 +206,24 @@
                     <div class="dropstart">
                         <button class="btn btn-link text-decoration-none mt-2 text-white" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="far fa-gears"></i> More
+                            <div class="d-flex gap-1 align-items-center">
+                                <i class="far fa-share"></i> Share
+                                <div style="font-size: 12px;">
+                                    {{ $updatesData->shares === 0 ? '' : "(" . $updatesData->shares . ")" }}
+                                </div>
+                            </div>
                         </button>
                         <ul class="dropdown-menu">
                             @if ($updatesData->user_id === auth()->user()->id)
                             <li wire:click='delete({{ $updatesData->id }})'><button class="dropdown-item"><i
                                         class="far fa-trash"></i> <strong>Delete</strong></button></li>
-                            <li
+                            <li wire:click.prevent='share({{ $updatesData->id }})'
                                 onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $updatesData->post_title) }}'); return false;">
                                 <a class="dropdown-item" href="#"><i class="far fa-link"></i>
                                     <strong>Copy Link</strong></a>
                             </li>
                             @else
-                            <li
+                            <li wire:click.prevent='share({{ $updatesData->id }})'
                                 onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $updatesData->post_title) }}'); return false;">
                                 <a class="dropdown-item" href="#"><i class="far fa-link"></i>
                                     <strong>Copy Link</strong></a>
@@ -308,7 +313,8 @@
                 </div>
                 <div class="modal-body m-0 p-0">
                     <div class="text-light p-4 rounded shadow-sm position-relative">
-                        <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px !important;">Posted on {{
+                        <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px !important;">Posted
+                            on {{
                             $updatesData->created_at->format('F d, Y g:i A') }}</span>
                         <div class="text-light">
                             <div class="d-flex align-items-center mb-2">

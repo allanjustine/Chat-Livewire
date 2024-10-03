@@ -356,6 +356,7 @@
                 <span class="text-white text-end" style="font-size: 12px !important;" wire:loading wire:target='sendMessage'>
                     Sending...
                 </span>
+
                 @forelse ($convos as $index => $convo)
 
                 @if ($convo->user_id === auth()->user()->id)

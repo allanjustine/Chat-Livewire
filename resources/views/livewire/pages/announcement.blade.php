@@ -107,7 +107,8 @@
             <div class="col-md-6 col-lg-4">
                 @forelse ($announcements as $announcement)
                 <div class="mb-4 bg-dark text-light p-4 rounded shadow-sm position-relative">
-                    <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px !important;">Posted on {{
+                    <span class="position-absolute top-0 end-0 pe-2 pt-2" style="font-size: 12px !important;">Posted on
+                        {{
                         $announcement->created_at->format('F d, Y g:i A') }}</span>
                     <div class="text-light">
                         <div class="d-flex align-items-center mb-2">
@@ -313,7 +314,12 @@
                         <div class="dropstart">
                             <button class="btn btn-link text-decoration-none text-white mt-2" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="far fa-gears"></i> More
+                                <div class="d-flex gap-1 align-items-center">
+                                    <i class="far fa-share"></i> Share
+                                    <div style="font-size: 12px;">
+                                        {{ $announcement->shares === 0 ? '' : "(" . $announcement->shares . ")" }}
+                                    </div>
+                                </div>
                             </button>
                             <ul class="dropdown-menu">
                                 @if ($announcement->user_id === auth()->user()->id)
@@ -322,7 +328,7 @@
                                             class="far fa-pen"></i> <strong>Edit</strong></button></li>
                                 <li wire:click='delete({{ $announcement->id }})'><button class="dropdown-item"><i
                                             class="far fa-trash"></i> <strong>Delete</strong></button></li>
-                                <li
+                                <li wire:click='share({{ $announcement->id }})'
                                     onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $announcement->post_title) }}'); return false;">
                                     <a class="dropdown-item" href="#"><i class="fas fa-link"></i>
                                         <strong>Copy Link</strong></a>
@@ -332,7 +338,7 @@
                                 <li wire:click='delete({{ $announcement->id }})'><button class="dropdown-item"><i
                                             class="far fa-trash"></i> <strong>Delete</strong></button></li>
                                 @endrole
-                                <li
+                                <li wire:click='share({{ $announcement->id }})'
                                     onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $announcement->post_title) }}'); return false;">
                                     <a class="dropdown-item" href="#"><i class="fas fa-link"></i>
                                         <strong>Copy Link</strong></a>
@@ -536,8 +542,8 @@
                                     @endif
                                     <hr>
                                     <span class="float-end" style="margin-top: -15px;"><a href="#" class="text-white"
-                                            style="font-size: 12px !important;">{{ $announcement->comments->count() <= 0 ? '' :
-                                                $announcement->comments->count() }}
+                                            style="font-size: 12px !important;">{{ $announcement->comments->count() <= 0
+                                                ? '' : $announcement->comments->count() }}
                                                 @if ($announcement->comments->count() <= 0) Be the first to comment
                                                     @elseif ($announcement->comments->count() == 1)
                                                     comment

@@ -43,11 +43,12 @@
     @livewire('layouts.navbar')
 
     <div id="preloader">
-        <div class="lds-facebook">
+        {{-- <div class="lds-facebook">
             <div></div>
             <div></div>
             <div></div>
-        </div>
+        </div> --}}
+        <iframe src="https://smctdevt.github.io/smctloder/" frameborder="0" allowfullscreen style="width: 100%; height: 100%;"></iframe>
     </div>
 
     {{ $slot }}

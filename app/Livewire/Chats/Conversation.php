@@ -5,6 +5,7 @@ namespace App\Livewire\Chats;
 use App\Events\GroupChatIsSeen;
 use App\Events\MessageSent;
 use App\Events\IsSeen as SeenNow;
+use App\Events\TypingIndicator;
 use App\Models\Chat;
 use App\Models\ChatReaction;
 use App\Models\ChatReply;
@@ -41,6 +42,7 @@ class Conversation extends Component
     public $unsentReply;
     public $authId;
     public $pageTitle;
+    public $isTyping = false;
 
     #[Validate(['nullable', 'max:5120'])]
     public $attachment = [];
@@ -311,7 +313,7 @@ class Conversation extends Component
             $this->unsentReply = '';
         }
 
-        broadcast(new MessageSent($chat))->toOthers();
+        event(new MessageSent($chat));
 
         $this->reset(['message', 'attachment']);
 
@@ -353,7 +355,7 @@ class Conversation extends Component
             $this->unsentReply = '';
         }
 
-        broadcast(new MessageSent($chat))->toOthers();
+        event(new MessageSent($chat));
 
         $this->dispatch('scrollBot');
     }
@@ -377,7 +379,7 @@ class Conversation extends Component
                 'status'        =>          'unsent'
             ]);
 
-            broadcast(new MessageSent($chat))->toOthers();
+            event(new MessageSent($chat));
         }
     }
 
@@ -551,7 +553,11 @@ class Conversation extends Component
         if ($reaction) {
             $reaction->delete();
 
-            $this->dispatch('closeModal', ['convoId' => $convoId]);
+            $remainingReactions = ChatReaction::where('chat_id', $convoId)->count();
+
+            if ($remainingReactions === 0) {
+                $this->dispatch('closeModal', ['convoId' => $convoId]);
+            }
         } else {
             ChatReaction::updateOrCreate([
                 'user_id'           =>              $user->id,
@@ -559,6 +565,10 @@ class Conversation extends Component
                 'chat_id'           =>              $convoId
             ]);
         }
+
+        $chat = Chat::find($convoId);
+
+        event(new MessageSent($chat));
     }
 
     public function replyToChat($convoId)
@@ -586,6 +596,16 @@ class Conversation extends Component
         $this->idFromChat = null;
         $this->replyContent = '';
         $this->unsentReply = '';
+    }
+
+    public function onTyping()
+    {
+        $this->isTyping = true;
+    }
+
+    public function stopTyping()
+    {
+        $this->isTyping = false;
     }
 
     public function render()
