@@ -3,13 +3,11 @@
         <div class="container-fluid">
             @auth
             <a class="navbar-brand" href="/home" wire:navigate>
-                <img src="/images/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-                Chat
+                <img src="/images/logo.png" alt="Logo" width="50" height="50" class="d-inline-block ms-3 align-text-top">
             </a>
             @else
             <a class="navbar-brand" href="/" wire:navigate>
-                <img src="/images/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-                Chat
+                <img src="/images/logo.png" alt="Logo" width="50" height="50" class="d-inline-block ms-3 align-text-top">
             </a>
             @endauth
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -20,16 +18,16 @@
                 @auth
                 <ul class="navbar-nav ms-auto gap-3 mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {{ 'home' === request()->path() ? 'active active-color rounded' : 'nav-hover rounded' }}" aria-current="page"
+                        <a class="nav-link {{ Request::is('home*') ? 'active active-color rounded' : 'nav-hover rounded' }}" aria-current="page"
                             href="/home" wire:navigate><i class="far fa-home"></i> Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ 'announcement' === request()->path() ? 'active active-color rounded' : 'nav-hover rounded' }}"
+                        <a class="nav-link {{ Request::is('announcement*') ? 'active active-color rounded' : 'nav-hover rounded' }}"
                             aria-current="page" href="/announcement" wire:navigate><i class="far fa-bullhorn"></i>
                             Announcements</a>
                     </li>
-                    <li class="nav-iteme">
-                        <a class="nav-link {{ 'chats' === request()->path() ? 'active active-color rounded' : 'nav-hover rounded' }}" href="/chats"
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('chats*') ? 'active active-color rounded' : 'nav-hover rounded' }}" href="/chats"
                             wire:navigate>
                             <i class="far fa-message-dots position-relative">
                                 @if ($totalChats > 9)
@@ -51,7 +49,7 @@
                     </li>
                     @role('admin')
                     <li class="nav-item">
-                        <a class="nav-link {{ 'admin/users' === request()->path() ? 'active active-color rounded' : 'nav-hover rounded' }}" href="/admin/users"
+                        <a class="nav-link {{ Request::is('admin/users*') ? 'active active-color rounded' : 'nav-hover rounded' }}" href="/admin/users"
                             wire:navigate>
                             <i class="far fa-users">
 
@@ -178,11 +176,11 @@
                 @else
                 <ul class="navbar-nav ms-auto gap-3 mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {{ 'login' === request()->path() ? 'active active-color rounded' : 'nav-hover rounded' }}" aria-current="page"
+                        <a class="nav-link {{ Request::is('login*') ? 'active active-color rounded' : 'nav-hover rounded' }}" aria-current="page"
                             href="/login" wire:navigate><i class="far fa-right-to-bracket"></i> Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ 'register' === request()->path() ? 'active active-color rounded' : 'nav-hover rounded' }}" href="/register"
+                        <a class="nav-link {{ Request::is('register*') ? 'active active-color rounded' : 'nav-hover rounded' }}" href="/register"
                             wire:navigate><i class="far fa-user-plus"></i> Register</a>
                     </li>
                 </ul>

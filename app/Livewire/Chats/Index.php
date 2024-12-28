@@ -152,9 +152,11 @@ class Index extends Component
         foreach ($groupChat->groupChatContents as $content) {
             if ($content->user_id != $user->id && !$content->groupChatSeenBies()->where('user_id', $user->id)->exists()) {
                 $content->groupChatSeenBies()->attach($user->id);
-                event(new GroupChatIsSeen($content));
             }
         }
+
+        $member = $groupChat->groupChatMembers;
+        event(new GroupChatIsSeen($member));
     }
 
     public function createGc()

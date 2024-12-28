@@ -11,7 +11,6 @@ use Livewire\Component;
 
 class Navbar extends Component
 {
-
     public $totalChats = 0;
     public $notifications = [];
     public $unreadNotificationsCount;

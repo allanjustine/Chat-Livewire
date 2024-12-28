@@ -1011,7 +1011,6 @@
                                     class="fas fa-thumbs-up text-primary" style="font-size: 25px;"></i></button>
                         </div>
                     </div>
-
                 </form>
             </div>
         </div>

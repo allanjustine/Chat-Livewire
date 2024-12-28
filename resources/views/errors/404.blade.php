@@ -33,8 +33,8 @@
 
 <body>
     <div class="not-found-container">
-        <img src="https://www.myphukettravel.com/assets/front-end/images/404.gif" alt="Not Found GIF" class="img-fluid mb-4"
-            style="max-width: 400px;">
+        <img src="https://www.myphukettravel.com/assets/front-end/images/404.gif" alt="Not Found GIF"
+            class="img-fluid mb-4" style="max-width: 400px;">
         <p>Oops! The page you are looking for does not exist.</p>
         <button type="button" onclick="goBack()" class="btn btn-primary mt-3">Go Back</button>
     </div>

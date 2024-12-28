@@ -218,13 +218,13 @@
                             <li wire:click='delete({{ $updatesData->id }})'><button class="dropdown-item"><i
                                         class="far fa-trash"></i> <strong>Delete</strong></button></li>
                             <li wire:click.prevent='share({{ $updatesData->id }})'
-                                onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $updatesData->post_title) }}'); return false;">
+                                onclick="copyLink('{{ url('http://136.239.196.178:5002/updates/' . $updatesData->post_title) }}'); return false;">
                                 <a class="dropdown-item" href="#"><i class="far fa-link"></i>
                                     <strong>Copy Link</strong></a>
                             </li>
                             @else
                             <li wire:click.prevent='share({{ $updatesData->id }})'
-                                onclick="copyLink('{{ url('http://136.239.196.178:5004/updates/' . $updatesData->post_title) }}'); return false;">
+                                onclick="copyLink('{{ url('http://136.239.196.178:5002/updates/' . $updatesData->post_title) }}'); return false;">
                                 <a class="dropdown-item" href="#"><i class="far fa-link"></i>
                                     <strong>Copy Link</strong></a>
                             </li>

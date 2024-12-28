@@ -13,12 +13,16 @@
                         <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-1">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" wire:model='password'>
                         @error('password')
                         <small class="text-danger">{{ $message }}</small>
                         @enderror
+                    </div>
+                    <div class="form-group mb-2 align-items-center d-flex gap-1">
+                        <input type="checkbox" id="show_password" style="cursor: pointer;" onclick="togglePassword()">
+                        <label for="show_password"><small>Show Password</small></label>
                     </div>
                     <div class="form-group mb-2 align-items-center d-flex gap-1">
                         <input type="checkbox" id="remember_me" wire:model="remember" style="cursor: pointer;">
@@ -39,6 +43,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function togglePassword() {
+            var x = document.getElementById("password");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
 
     <script>
         document.addEventListener('livewire:navigated', ()=>{

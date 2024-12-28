@@ -1,7 +1,7 @@
 <div>
     <div class="bg-cover">
         <div class="hero-text text-center">
-            <h2>Welcome to Chat</h2>
+            <h2>Welcome to SMCT Chat</h2>
             <p>Connect with people around the world in real-time.</p>
             <a href="/login" wire:navigate class="btn btn-primary btn-sm">Get Started</a>
         </div>

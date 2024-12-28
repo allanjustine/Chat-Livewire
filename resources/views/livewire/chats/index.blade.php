@@ -282,7 +282,7 @@
             </nav>
             <div class="d-flex flex-column justify-content-center align-items-center" style="height: 91.5vh;">
                 <div>
-                    <p class="text-center"><strong style="font-size: 50px;">Welcome To Chat</strong></p>
+                    <p class="text-center"><strong style="font-size: 50px;">Welcome To SMCT Chat</strong></p>
                 </div>
                 <div>
                     <p class="text-center">Your total unseen messages: <span class="badge text-bg-info text-white"
