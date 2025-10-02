@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ParsableContent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
@@ -35,5 +36,12 @@ class Chat extends Model
     public function chatReplies(): HasMany
     {
         return $this->hasMany(ChatReply::class)->chaperone();
+    }
+
+    public function getMessageAttribute(?string $value): ?string
+    {
+        $content = new ParsableContent();
+
+        return $value !== null && $value !== '' && $value !== '0' ? $content->parse($value) : null;
     }
 }

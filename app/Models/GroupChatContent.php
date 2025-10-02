@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ParsableContent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,5 +49,12 @@ class GroupChatContent extends Model
     public function groupChatReplies(): HasMany
     {
         return $this->hasMany(GroupChatReply::class)->chaperone();
+    }
+
+    public function getMessageAttribute(?string $value): ?string
+    {
+        $content = new ParsableContent();
+
+        return $value !== null && $value !== '' && $value !== '0' ? $content->parse($value) : null;
     }
 }

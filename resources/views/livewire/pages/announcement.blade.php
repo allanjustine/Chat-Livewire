@@ -329,7 +329,7 @@
                                 <li wire:click='delete({{ $announcement->id }})'><button class="dropdown-item"><i
                                             class="far fa-trash"></i> <strong>Delete</strong></button></li>
                                 <li wire:click='share({{ $announcement->id }})'
-                                    onclick="copyLink('{{ url('http://136.239.196.178:5002/updates/' . $announcement->post_title) }}'); return false;">
+                                    onclick="copyLink('{{ url('http://localhost:5002/updates/' . $announcement->post_title) }}'); return false;">
                                     <a class="dropdown-item" href="#"><i class="fas fa-link"></i>
                                         <strong>Copy Link</strong></a>
                                 </li>
@@ -339,7 +339,7 @@
                                             class="far fa-trash"></i> <strong>Delete</strong></button></li>
                                 @endrole
                                 <li wire:click='share({{ $announcement->id }})'
-                                    onclick="copyLink('{{ url('http://136.239.196.178:5002/updates/' . $announcement->post_title) }}'); return false;">
+                                    onclick="copyLink('{{ url('http://localhost:5002/updates/' . $announcement->post_title) }}'); return false;">
                                     <a class="dropdown-item" href="#"><i class="fas fa-link"></i>
                                         <strong>Copy Link</strong></a>
                                 </li>

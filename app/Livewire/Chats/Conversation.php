@@ -43,6 +43,7 @@ class Conversation extends Component
     public $authId;
     public $pageTitle;
     public $isTyping = false;
+    public $isSenderId;
 
     #[Validate(['nullable', 'max:5120'])]
     public $attachment = [];
@@ -112,10 +113,6 @@ class Conversation extends Component
             ->first();
 
         $this->toSeen = $userCountUnread->unseen_sender_chats_count;
-
-        foreach ($convos as $convo) {
-            $convo->message = $this->escapeAndConvertUrlsToLinks($convo->message);
-        }
 
         // foreach ($convos as $convo) {
         //     if (filter_var($convo->message, FILTER_VALIDATE_URL)) {
@@ -229,22 +226,15 @@ class Conversation extends Component
         return compact('allChats');
     }
 
-    protected function escapeAndConvertUrlsToLinks($text)
-    {
-        $escapedText = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-
-        $urlPattern = '@(https?://[^\s<>"\'()]+\.[^\s<>"\'()]+)@i';
-        $convertedText = preg_replace($urlPattern, '<a href="$1" target="_blank" style="color: #095ad2; background-color: #000000c7; border-radius: 5px; padding: 2px 5px 2px 5px;" title="$1"><strong>$1</strong></a>', $escapedText);
-
-        return $convertedText;
-    }
-
+    #[On('echo:sendMessage.{authId},MessageSent')]
     public function mount($userToken)
     {
         $convo = User::with(['senderChats', 'receiverChats'])
             ->where('user_token', $userToken)
             ->first();
         $this->authId = auth()->user()->id;
+
+        $this->isSenderId = $convo->id;
 
         $this->previous = URL::previous();
 
@@ -412,6 +402,23 @@ class Conversation extends Component
                 ]);
             }
         }
+    }
+
+    #[On('echo:sendMessage.{authId},MessageSent')]
+    public function seenNow($event)
+    {
+        $data = $event['chat'];
+
+        if ($data['sender_id'] !== $this->isSenderId) return;
+
+        $userReceiverId = auth()->user()->id;
+        $isSeen = Chat::where('sender_id', $data['sender_id'])
+            ->where('receiver_id', $userReceiverId)
+            ->where('is_seen', false)
+            ->update([
+                'is_seen'       =>      true
+            ]);
+        event(new SeenNow($data['sender_id'], $userReceiverId));
     }
 
     // #[On(['submitEnter'])]

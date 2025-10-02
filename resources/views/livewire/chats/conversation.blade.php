@@ -376,7 +376,7 @@
                                     @if($convo->message === '(y)')
                                     <i class="fa-solid fa-thumbs-up text-primary" style="font-size: 60px;"></i>
                                     @else
-                                    {!! nl2br($convo->message) !!}
+                                    {!! nl2br(trim($convo->message)) !!}
                                     @endif
                                 </p>
                                 @endif
@@ -574,7 +574,7 @@
                                     @if ($convo->message === '(y)')
                                     <i class="fa-solid fa-thumbs-up text-primary" style="font-size: 60px;"></i>
                                     @else
-                                    {!! nl2br($convo->message) !!}
+                                    {!! nl2br(trim($convo->message)) !!}
                                     @endif
                                 </p>
                                 @endif
